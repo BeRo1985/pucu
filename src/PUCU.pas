@@ -160,7 +160,7 @@ unit PUCU;
 
 interface
 
-uses SysUtils,Classes,PUCUUnicodePass2;
+uses SysUtils,Classes;
 
 const suDONOTKNOW=-1;
       suNOUTF8=0;

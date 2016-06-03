@@ -3222,6 +3222,10 @@ begin
    FinalSourceList.LoadFromFile('PUCUCode.pas');
    for LineIndex:=FinalSourceList.Count-1 downto 0 do begin
     Line:=FinalSourceList.Strings[LineIndex];
+    if pos(',PUCUUnicodePass2',Line)>0 then begin
+     FinalSourceList.Strings[LineIndex]:=StringReplace(FinalSourceList.Strings[LineIndex],',PUCUUnicodePass2','',[rfReplaceAll]);
+     continue;
+    end;
     if pos('unit PUCUCode;',Line)=1 then begin
      FinalSourceList.Strings[LineIndex]:='unit PUCU;';
 {$ifdef PUCUStrictUTF8}
