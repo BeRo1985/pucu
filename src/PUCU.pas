@@ -49,7 +49,7 @@
  *                                                                            *
  ******************************************************************************)
 unit PUCU;
-{$ifdef PUCUStrictUTF8}
+{$define PUCUStrictUTF8}
 {$ifdef fpc}
  {$mode delphi}
  {$ifdef cpui386}

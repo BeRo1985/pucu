@@ -3229,7 +3229,7 @@ begin
     if pos('unit PUCUCode;',Line)=1 then begin
      FinalSourceList.Strings[LineIndex]:='unit PUCU;';
 {$ifdef PUCUStrictUTF8}
-     FinalSourceList.Insert(LineIndex+1,'{$ifdef PUCUStrictUTF8}');
+     FinalSourceList.Insert(LineIndex+1,'{$define PUCUStrictUTF8}');
 {$endif}
      continue;
     end;
