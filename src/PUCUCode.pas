@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2016-06-25-00-21-0000                       *
+ *                        Version 2016-06-25-00-50-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -309,6 +309,15 @@ const suDONOTKNOW=-1;
       ucACCEPT=0;
       ucERROR=16;
 
+      cpLATIN1=28591;
+      cpISO_8859_1=28591;
+
+      cpUTF16LE=1200;
+      cpUTF16BE=1200;
+
+      cpUTF7=65000;
+      cpUTF8=65001;
+
 type PPUCUInt8=^TPUCUInt8;
      TPUCUInt8={$ifdef fpc}Int8{$else}ShortInt{$endif};
 
@@ -459,17 +468,17 @@ function PUCUUTF32ToUTF16(const Value:TPUCUUTF32String):TPUCUUTF16String;
 function PUCUUTF32CharToUTF16(const Value:TPUCUUTF32Char):TPUCUUTF16String;
 function PUCUUTF32CharToUTF16Len(const Value:TPUCUUTF32Char):TPUCUInt32;
 
-function PUCURawDataToUTF8String(const pData;const pDataLength:TPUCUInt32):TPUCUUTF8String;
-function PUCURawDataToUTF16String(const pData;const pDataLength:TPUCUInt32):TPUCUUTF16String;
-function PUCURawDataToUTF32String(const pData;const pDataLength:TPUCUInt32):TPUCUUTF32String;
+function PUCURawDataToUTF8String(const pData;const pDataLength:TPUCUInt32;const pCodePage:TPUCUInt32=-1):TPUCUUTF8String;
+function PUCURawDataToUTF16String(const pData;const pDataLength:TPUCUInt32;const pCodePage:TPUCUInt32=-1):TPUCUUTF16String;
+function PUCURawDataToUTF32String(const pData;const pDataLength:TPUCUInt32;const pCodePage:TPUCUInt32=-1):TPUCUUTF32String;
 
-function PUCURawByteStringToUTF8String(const pString:TPUCURawByteString):TPUCUUTF8String;
-function PUCURawByteStringToUTF16String(const pString:TPUCURawByteString):TPUCUUTF16String;
-function PUCURawByteStringToUTF32String(const pString:TPUCURawByteString):TPUCUUTF32String;
+function PUCURawByteStringToUTF8String(const pString:TPUCURawByteString;const pCodePage:TPUCUInt32=-1):TPUCUUTF8String;
+function PUCURawByteStringToUTF16String(const pString:TPUCURawByteString;const pCodePage:TPUCUInt32=-1):TPUCUUTF16String;
+function PUCURawByteStringToUTF32String(const pString:TPUCURawByteString;const pCodePage:TPUCUInt32=-1):TPUCUUTF32String;
 
-function PUCURawStreamToUTF8String(const pStream:TStream):TPUCUUTF8String;
-function PUCURawStreamToUTF16String(const pStream:TStream):TPUCUUTF16String;
-function PUCURawStreamToUTF32String(const pStream:TStream):TPUCUUTF32String;
+function PUCURawStreamToUTF8String(const pStream:TStream;const pCodePage:TPUCUInt32=-1):TPUCUUTF8String;
+function PUCURawStreamToUTF16String(const pStream:TStream;const pCodePage:TPUCUInt32=-1):TPUCUUTF16String;
+function PUCURawStreamToUTF32String(const pStream:TStream;const pCodePage:TPUCUInt32=-1):TPUCUUTF32String;
 
 implementation
 
@@ -2352,21 +2361,77 @@ end;
 const UTF16LittleEndianBigEndianShifts:array[0..1,0..1] of TPUCUInt32=((0,8),(8,0));
       UTF32LittleEndianBigEndianShifts:array[0..1,0..3] of TPUCUInt32=((0,8,16,24),(24,16,8,0));
 
-function PUCURawDataToUTF8String(const pData;const pDataLength:TPUCUInt32):TPUCUUTF8String;
+function PUCURawDataToUTF8String(const pData;const pDataLength:TPUCUInt32;const pCodePage:TPUCUInt32=-1):TPUCUUTF8String;
 type PBytes=^TBytes;
      TBytes=array[0..65535] of TPUCUUInt8;
 var Bytes:PBytes;
     BytesPerCodeUnit,BytesPerCodeUnitMask,LittleEndianBigEndian,
     PassIndex,CodeUnit,CodePoint,Temp,InputLen,OutputLen:TPUCUInt32;
+    CodePage:PPUCUCharSetCodePage;
+    SubCodePages:PPUCUCharSetSubCodePages;
+    SubSubCodePages:PPUCUCharSetSubSubCodePages;
 begin
+ begin
+  CodePage:=nil;
+  if (pCodePage>=0) and (pCodePage<=65535) then begin
+   SubCodePages:=PUCUCharSetCodePages[(pCodePage shr 8) and $ff];
+   if assigned(SubCodePages) then begin
+    SubSubCodePages:=SubCodePages^[(pCodePage shr 4) and $f];
+    if assigned(SubSubCodePages) then begin
+     CodePage:=SubSubCodePages^[(pCodePage shr 0) and $f];
+    end;
+   end;
+  end;
+ end;
  result:='';
  Bytes:=@pData;
- if (pDataLength>=3) and (Bytes^[0]=$ef) and (Bytes^[1]=$bb) and (Bytes^[2]=$bf) then begin
+ if pCodePage=cpUTF16LE then begin
+  // UTF16 little endian (per code page)
+  BytesPerCodeUnit:=2;
+  BytesPerCodeUnitMask:=1;
+  LittleEndianBigEndian:=0;
+  if (pDataLength>=2) and
+     ((Bytes^[0]=$ff) and (Bytes^[1]=$fe)) then begin
+   Bytes:=@Bytes^[2];
+   InputLen:=pDataLength-2;
+  end else begin
+   Bytes:=@Bytes^[0];
+   InputLen:=pDataLength;
+  end;
+ end else if pCodePage=cpUTF16BE then begin
+  // UTF16 big endian (per code page)
+  BytesPerCodeUnit:=2;
+  BytesPerCodeUnitMask:=1;
+  LittleEndianBigEndian:=1;
+  if (pDataLength>=2) and
+     ((Bytes^[0]=$fe) and (Bytes^[1]=$ff)) then begin
+   Bytes:=@Bytes^[2];
+   InputLen:=pDataLength-2;
+  end else begin
+   Bytes:=@Bytes^[0];
+   InputLen:=pDataLength;
+  end;
+ end else if pCodePage=cpUTF7 then begin
+  // UTF7 (per code page)
+  raise Exception.Create('UTF-7 not supported');
+ end else if pCodePage=cpUTF8 then begin
+  // UTF8 (per code page)
+  BytesPerCodeUnit:=1;
+  BytesPerCodeUnitMask:=0;
+  LittleEndianBigEndian:=0;
+  if (pDataLength>=3) and (Bytes^[0]=$ef) and (Bytes^[1]=$bb) and (Bytes^[2]=$bf) then begin
+   Bytes:=@Bytes^[3];
+   InputLen:=pDataLength-3;
+  end else begin
+   Bytes:=@Bytes^[0];
+   InputLen:=pDataLength;
+  end;
+ end else if (pDataLength>=3) and (Bytes^[0]=$ef) and (Bytes^[1]=$bb) and (Bytes^[2]=$bf) then begin
   // UTF8
   BytesPerCodeUnit:=1;
   BytesPerCodeUnitMask:=0;
   LittleEndianBigEndian:=0;
-  Bytes:=@Bytes^[0];
+  Bytes:=@Bytes^[3];
   InputLen:=pDataLength-3;
  end else if (pDataLength>=4) and
              (((Bytes^[0]=$00) and (Bytes^[1]=$00) and (Bytes^[2]=$fe) and (Bytes^[3]=$ff)) or
@@ -2438,9 +2503,12 @@ begin
      inc(CodeUnit,4);
     end;
     else begin
-     // Latin1
+     // Latin1 or custom code page
      CodePoint:=Bytes^[CodeUnit];
      inc(CodeUnit);
+     if assigned(CodePage) then begin
+      CodePoint:=CodePage^[CodePoint and $ff];
+     end;
     end;
    end;
    if PassIndex=0 then begin
@@ -2529,21 +2597,77 @@ begin
  end;
 end;
 
-function PUCURawDataToUTF16String(const pData;const pDataLength:TPUCUInt32):TPUCUUTF16String;
+function PUCURawDataToUTF16String(const pData;const pDataLength:TPUCUInt32;const pCodePage:TPUCUInt32=-1):TPUCUUTF16String;
 type PBytes=^TBytes;
      TBytes=array[0..65535] of TPUCUUInt8;
 var Bytes:PBytes;
     BytesPerCodeUnit,BytesPerCodeUnitMask,LittleEndianBigEndian,
     PassIndex,CodeUnit,CodePoint,Temp,InputLen,OutputLen:TPUCUInt32;
+    CodePage:PPUCUCharSetCodePage;
+    SubCodePages:PPUCUCharSetSubCodePages;
+    SubSubCodePages:PPUCUCharSetSubSubCodePages;
 begin
+ begin
+  CodePage:=nil;
+  if (pCodePage>=0) and (pCodePage<=65535) then begin
+   SubCodePages:=PUCUCharSetCodePages[(pCodePage shr 8) and $ff];
+   if assigned(SubCodePages) then begin
+    SubSubCodePages:=SubCodePages^[(pCodePage shr 4) and $f];
+    if assigned(SubSubCodePages) then begin
+     CodePage:=SubSubCodePages^[(pCodePage shr 0) and $f];
+    end;
+   end;
+  end;
+ end;
  result:='';
  Bytes:=@pData;
- if (pDataLength>=3) and (Bytes^[0]=$ef) and (Bytes^[1]=$bb) and (Bytes^[2]=$bf) then begin
+ if pCodePage=cpUTF16LE then begin
+  // UTF16 little endian (per code page)
+  BytesPerCodeUnit:=2;
+  BytesPerCodeUnitMask:=1;
+  LittleEndianBigEndian:=0;
+  if (pDataLength>=2) and
+     ((Bytes^[0]=$ff) and (Bytes^[1]=$fe)) then begin
+   Bytes:=@Bytes^[2];
+   InputLen:=pDataLength-2;
+  end else begin
+   Bytes:=@Bytes^[0];
+   InputLen:=pDataLength;
+  end;
+ end else if pCodePage=cpUTF16BE then begin
+  // UTF16 big endian (per code page)
+  BytesPerCodeUnit:=2;
+  BytesPerCodeUnitMask:=1;
+  LittleEndianBigEndian:=1;
+  if (pDataLength>=2) and
+     ((Bytes^[0]=$fe) and (Bytes^[1]=$ff)) then begin
+   Bytes:=@Bytes^[2];
+   InputLen:=pDataLength-2;
+  end else begin
+   Bytes:=@Bytes^[0];
+   InputLen:=pDataLength;
+  end;
+ end else if pCodePage=cpUTF7 then begin
+  // UTF7 (per code page)
+  raise Exception.Create('UTF-7 not supported');
+ end else if pCodePage=cpUTF8 then begin
+  // UTF8 (per code page)
+  BytesPerCodeUnit:=1;
+  BytesPerCodeUnitMask:=0;
+  LittleEndianBigEndian:=0;
+  if (pDataLength>=3) and (Bytes^[0]=$ef) and (Bytes^[1]=$bb) and (Bytes^[2]=$bf) then begin
+   Bytes:=@Bytes^[3];
+   InputLen:=pDataLength-3;
+  end else begin
+   Bytes:=@Bytes^[0];
+   InputLen:=pDataLength;
+  end;
+ end else if (pDataLength>=3) and (Bytes^[0]=$ef) and (Bytes^[1]=$bb) and (Bytes^[2]=$bf) then begin
   // UTF8
   BytesPerCodeUnit:=1;
   BytesPerCodeUnitMask:=0;
   LittleEndianBigEndian:=0;
-  Bytes:=@Bytes^[0];
+  Bytes:=@Bytes^[3];
   InputLen:=pDataLength-3;
  end else if (pDataLength>=4) and
              (((Bytes^[0]=$00) and (Bytes^[1]=$00) and (Bytes^[2]=$fe) and (Bytes^[3]=$ff)) or
@@ -2615,9 +2739,12 @@ begin
      inc(CodeUnit,4);
     end;
     else begin
-     // Latin1
+     // Latin1 or custom code page
      CodePoint:=Bytes^[CodeUnit];
      inc(CodeUnit);
+     if assigned(CodePage) then begin
+      CodePoint:=CodePage^[CodePoint and $ff];
+     end;
     end;
    end;
    if PassIndex=0 then begin
@@ -2645,21 +2772,77 @@ begin
  end;
 end;
 
-function PUCURawDataToUTF32String(const pData;const pDataLength:TPUCUInt32):TPUCUUTF32String;
+function PUCURawDataToUTF32String(const pData;const pDataLength:TPUCUInt32;const pCodePage:TPUCUInt32=-1):TPUCUUTF32String;
 type PBytes=^TBytes;
      TBytes=array[0..65535] of TPUCUUInt8;
 var Bytes:PBytes;
     BytesPerCodeUnit,BytesPerCodeUnitMask,LittleEndianBigEndian,
     PassIndex,CodeUnit,CodePoint,Temp,InputLen,OutputLen:TPUCUInt32;
+    CodePage:PPUCUCharSetCodePage;
+    SubCodePages:PPUCUCharSetSubCodePages;
+    SubSubCodePages:PPUCUCharSetSubSubCodePages;
 begin
+ begin
+  CodePage:=nil;
+  if (pCodePage>=0) and (pCodePage<=65535) then begin
+   SubCodePages:=PUCUCharSetCodePages[(pCodePage shr 8) and $ff];
+   if assigned(SubCodePages) then begin
+    SubSubCodePages:=SubCodePages^[(pCodePage shr 4) and $f];
+    if assigned(SubSubCodePages) then begin
+     CodePage:=SubSubCodePages^[(pCodePage shr 0) and $f];
+    end;
+   end;
+  end;
+ end;
  result:=nil;
  Bytes:=@pData;
- if (pDataLength>=3) and (Bytes^[0]=$ef) and (Bytes^[1]=$bb) and (Bytes^[2]=$bf) then begin
+ if pCodePage=cpUTF16LE then begin
+  // UTF16 little endian (per code page)
+  BytesPerCodeUnit:=2;
+  BytesPerCodeUnitMask:=1;
+  LittleEndianBigEndian:=0;
+  if (pDataLength>=2) and
+     ((Bytes^[0]=$ff) and (Bytes^[1]=$fe)) then begin
+   Bytes:=@Bytes^[2];
+   InputLen:=pDataLength-2;
+  end else begin
+   Bytes:=@Bytes^[0];
+   InputLen:=pDataLength;
+  end;
+ end else if pCodePage=cpUTF16BE then begin
+  // UTF16 big endian (per code page)
+  BytesPerCodeUnit:=2;
+  BytesPerCodeUnitMask:=1;
+  LittleEndianBigEndian:=1;
+  if (pDataLength>=2) and
+     ((Bytes^[0]=$fe) and (Bytes^[1]=$ff)) then begin
+   Bytes:=@Bytes^[2];
+   InputLen:=pDataLength-2;
+  end else begin
+   Bytes:=@Bytes^[0];
+   InputLen:=pDataLength;
+  end;
+ end else if pCodePage=cpUTF7 then begin
+  // UTF7 (per code page)
+  raise Exception.Create('UTF-7 not supported');
+ end else if pCodePage=cpUTF8 then begin
+  // UTF8 (per code page)
+  BytesPerCodeUnit:=1;
+  BytesPerCodeUnitMask:=0;
+  LittleEndianBigEndian:=0;
+  if (pDataLength>=3) and (Bytes^[0]=$ef) and (Bytes^[1]=$bb) and (Bytes^[2]=$bf) then begin
+   Bytes:=@Bytes^[3];
+   InputLen:=pDataLength-3;
+  end else begin
+   Bytes:=@Bytes^[0];
+   InputLen:=pDataLength;
+  end;
+ end else if (pDataLength>=3) and (Bytes^[0]=$ef) and (Bytes^[1]=$bb) and (Bytes^[2]=$bf) then begin
   // UTF8
   BytesPerCodeUnit:=1;
   BytesPerCodeUnitMask:=0;
   LittleEndianBigEndian:=0;
-  Bytes:=@Bytes^[0];
+  Bytes:=@Bytes^[3];
   InputLen:=pDataLength-3;
  end else if (pDataLength>=4) and
              (((Bytes^[0]=$00) and (Bytes^[1]=$00) and (Bytes^[2]=$fe) and (Bytes^[3]=$ff)) or
@@ -2731,9 +2914,12 @@ begin
      inc(CodeUnit,4);
     end;
     else begin
-     // Latin1
+     // Latin1 or custom code page
      CodePoint:=Bytes^[CodeUnit];
      inc(CodeUnit);
+     if assigned(CodePage) then begin
+      CodePoint:=CodePage^[CodePoint and $ff];
+     end;
     end;
    end;
    if PassIndex=0 then begin
@@ -2749,40 +2935,40 @@ begin
  end;
 end;
 
-function PUCURawByteStringToUTF8String(const pString:TPUCURawByteString):TPUCUUTF8String;
+function PUCURawByteStringToUTF8String(const pString:TPUCURawByteString;const pCodePage:TPUCUInt32=-1):TPUCUUTF8String;
 var p:PPUCURawByteChar;
 begin
  if length(pString)>0 then begin
   p:=PPUCURawByteChar(@pString[1]);
-  result:=PUCURawDataToUTF8String(p^,length(pString));
+  result:=PUCURawDataToUTF8String(p^,length(pString),pCodePage);
  end else begin
   result:='';
  end;
 end;
 
-function PUCURawByteStringToUTF16String(const pString:TPUCURawByteString):TPUCUUTF16String;
+function PUCURawByteStringToUTF16String(const pString:TPUCURawByteString;const pCodePage:TPUCUInt32=-1):TPUCUUTF16String;
 var p:PPUCURawByteChar;
 begin
  if length(pString)>0 then begin
   p:=PPUCURawByteChar(@pString[1]);
-  result:=PUCURawDataToUTF16String(p^,length(pString));
+  result:=PUCURawDataToUTF16String(p^,length(pString),pCodePage);
  end else begin
   result:='';
  end;
 end;
 
-function PUCURawByteStringToUTF32String(const pString:TPUCURawByteString):TPUCUUTF32String;
+function PUCURawByteStringToUTF32String(const pString:TPUCURawByteString;const pCodePage:TPUCUInt32=-1):TPUCUUTF32String;
 var p:PPUCURawByteChar;
 begin
  if length(pString)>0 then begin
   p:=PPUCURawByteChar(@pString[1]);
-  result:=PUCURawDataToUTF32String(p^,length(pString));
+  result:=PUCURawDataToUTF32String(p^,length(pString),pCodePage);
  end else begin
   result:=nil;
  end;
 end;
 
-function PUCURawStreamToUTF8String(const pStream:TStream):TPUCUUTF8String;
+function PUCURawStreamToUTF8String(const pStream:TStream;const pCodePage:TPUCUInt32=-1):TPUCUUTF8String;
 var Memory:pointer;
     Size:TPUCUPtrInt;
 begin
@@ -2792,7 +2978,7 @@ begin
   GetMem(Memory,Size);
   try
    if pStream.Read(Memory^,Size)=Size then begin
-    result:=PUCURawDataToUTF8String(Memory^,Size);
+    result:=PUCURawDataToUTF8String(Memory^,Size,pCodePage);
    end;
   finally
    FreeMem(Memory);
@@ -2800,7 +2986,7 @@ begin
  end;
 end;
 
-function PUCURawStreamToUTF16String(const pStream:TStream):TPUCUUTF16String;
+function PUCURawStreamToUTF16String(const pStream:TStream;const pCodePage:TPUCUInt32=-1):TPUCUUTF16String;
 var Memory:pointer;
     Size:TPUCUPtrInt;
 begin
@@ -2810,7 +2996,7 @@ begin
   GetMem(Memory,Size);
   try
    if pStream.Read(Memory^,Size)=Size then begin
-    result:=PUCURawDataToUTF16String(Memory^,Size);
+    result:=PUCURawDataToUTF16String(Memory^,Size,pCodePage);
    end;
   finally
    FreeMem(Memory);
@@ -2818,7 +3004,7 @@ begin
  end;
 end;
 
-function PUCURawStreamToUTF32String(const pStream:TStream):TPUCUUTF32String;
+function PUCURawStreamToUTF32String(const pStream:TStream;const pCodePage:TPUCUInt32=-1):TPUCUUTF32String;
 var Memory:pointer;
     Size:TPUCUPtrInt;
 begin
@@ -2828,7 +3014,7 @@ begin
   GetMem(Memory,Size);
   try
    if pStream.Read(Memory^,Size)=Size then begin
-    result:=PUCURawDataToUTF32String(Memory^,Size);
+    result:=PUCURawDataToUTF32String(Memory^,Size,pCodePage);
    end;
   finally
    FreeMem(Memory);
