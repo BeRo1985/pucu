@@ -130,6 +130,13 @@ program PUCUDebug;
 
 uses SysUtils,Classes,PUCUCode;
 
-begin
  // Used only for to debug&test the input PUCUCode.pas for POCABuild.dpr
+var Stream:TStream;
+begin
+ Stream:=TFileStream.Create('test.js',fmOpenRead or fmShareDenyWrite);
+ try
+  PUCURawStreamToUTF16String(Stream);
+ finally
+  Stream.Free;
+ end;
 end.

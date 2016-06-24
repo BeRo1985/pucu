@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2016-06-25-00-00-0000                       *
+ *                        Version 2016-06-25-00-08-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -2365,7 +2365,7 @@ begin
   BytesPerCodeUnit:=1;
   BytesPerCodeUnitMask:=0;
   LittleEndianBigEndian:=0;
-  Bytes:=@PBytes(@pData)^[0];
+  Bytes:=@Bytes^[0];
   InputLen:=pDataLength-3;
  end else if (pDataLength>=4) and
              (((Bytes^[0]=$00) and (Bytes^[1]=$00) and (Bytes^[2]=$fe) and (Bytes^[3]=$ff)) or
@@ -2380,7 +2380,7 @@ begin
    // Little endian
    LittleEndianBigEndian:=0;
   end;
-  Bytes:=@PBytes(@pData)^[4];
+  Bytes:=@Bytes^[4];
   InputLen:=pDataLength-4;
  end else if (pDataLength>=2) and
              (((Bytes^[0]=$fe) and (Bytes^[1]=$ff)) or
@@ -2395,19 +2395,18 @@ begin
    // Little endian
    LittleEndianBigEndian:=0;
   end;
-  Bytes:=@PBytes(@pData)^[2];
+  Bytes:=@Bytes^[2];
   InputLen:=pDataLength-2;
  end else begin
   // Latin1
   BytesPerCodeUnit:=0;
   BytesPerCodeUnitMask:=0;
   LittleEndianBigEndian:=0;
-  Bytes:=@PBytes(@pData)^[0];
+  Bytes:=@Bytes^[0];
   InputLen:=pDataLength;
  end;
  for PassIndex:=0 to 1 do begin
   CodeUnit:=0;
-  InputLen:=pDataLength-3;
   OutputLen:=0;
   while (CodeUnit+BytesPerCodeUnitMask)<InputLen do begin
    case BytesPerCodeUnit of
@@ -2543,7 +2542,7 @@ begin
   BytesPerCodeUnit:=1;
   BytesPerCodeUnitMask:=0;
   LittleEndianBigEndian:=0;
-  Bytes:=@PBytes(@pData)^[0];
+  Bytes:=@Bytes^[0];
   InputLen:=pDataLength-3;
  end else if (pDataLength>=4) and
              (((Bytes^[0]=$00) and (Bytes^[1]=$00) and (Bytes^[2]=$fe) and (Bytes^[3]=$ff)) or
@@ -2558,7 +2557,7 @@ begin
    // Little endian
    LittleEndianBigEndian:=0;
   end;
-  Bytes:=@PBytes(@pData)^[4];
+  Bytes:=@Bytes^[4];
   InputLen:=pDataLength-4;
  end else if (pDataLength>=2) and
              (((Bytes^[0]=$fe) and (Bytes^[1]=$ff)) or
@@ -2573,19 +2572,18 @@ begin
    // Little endian
    LittleEndianBigEndian:=0;
   end;
-  Bytes:=@PBytes(@pData)^[2];
+  Bytes:=@Bytes^[2];
   InputLen:=pDataLength-2;
  end else begin
   // Latin1
   BytesPerCodeUnit:=0;
   BytesPerCodeUnitMask:=0;
   LittleEndianBigEndian:=0;
-  Bytes:=@PBytes(@pData)^[0];
+  Bytes:=@Bytes^[0];
   InputLen:=pDataLength;
  end;
  for PassIndex:=0 to 1 do begin
   CodeUnit:=0;
-  InputLen:=pDataLength-3;
   OutputLen:=0;
   while (CodeUnit+BytesPerCodeUnitMask)<InputLen do begin
    case BytesPerCodeUnit of
@@ -2660,7 +2658,7 @@ begin
   BytesPerCodeUnit:=1;
   BytesPerCodeUnitMask:=0;
   LittleEndianBigEndian:=0;
-  Bytes:=@PBytes(@pData)^[0];
+  Bytes:=@Bytes^[0];
   InputLen:=pDataLength-3;
  end else if (pDataLength>=4) and
              (((Bytes^[0]=$00) and (Bytes^[1]=$00) and (Bytes^[2]=$fe) and (Bytes^[3]=$ff)) or
@@ -2675,7 +2673,7 @@ begin
    // Little endian
    LittleEndianBigEndian:=0;
   end;
-  Bytes:=@PBytes(@pData)^[4];
+  Bytes:=@Bytes^[4];
   InputLen:=pDataLength-4;
  end else if (pDataLength>=2) and
              (((Bytes^[0]=$fe) and (Bytes^[1]=$ff)) or
@@ -2690,19 +2688,18 @@ begin
    // Little endian
    LittleEndianBigEndian:=0;
   end;
-  Bytes:=@PBytes(@pData)^[2];
+  Bytes:=@Bytes^[2];
   InputLen:=pDataLength-2;
  end else begin
   // Latin1
   BytesPerCodeUnit:=0;
   BytesPerCodeUnitMask:=0;
   LittleEndianBigEndian:=0;
-  Bytes:=@PBytes(@pData)^[0];
+  Bytes:=@Bytes^[0];
   InputLen:=pDataLength;
  end;
  for PassIndex:=0 to 1 do begin
   CodeUnit:=0;
-  InputLen:=pDataLength-3;
   OutputLen:=0;
   while (CodeUnit+BytesPerCodeUnitMask)<InputLen do begin
    case BytesPerCodeUnit of
