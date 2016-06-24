@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2016-06-24-19-09-0000                       *
+ *                        Version 2016-06-24-22-25-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -438,6 +438,10 @@ function PUCUUTF8FromLatin1(const Str:TPUCURawByteString):TPUCURawByteString;
 function PUCUUTF8LevenshteinDistance(const s,t:TPUCURawByteString):TPUCUInt32;
 function PUCUUTF8DamerauLevenshteinDistance(const s,t:TPUCURawByteString):TPUCUInt32;
 function PUCUStringLength(const s:TPUCURawByteString):TPUCUInt32;
+
+function PUCUUTF16Correct(const Str:TPUCUUTF16String):TPUCUUTF16String;
+function PUCUUTF16UpperCase(const Str:TPUCUUTF16String):TPUCUUTF16String;
+function PUCUUTF16LowerCase(const Str:TPUCUUTF16String):TPUCUUTF16String;
 
 function PUCUUTF32CharToUTF8(CharValue:TPUCUUTF32Char):TPUCURawByteString;
 function PUCUUTF32CharToUTF8Len(CharValue:TPUCUUTF32Char):TPUCUInt32;
@@ -1673,6 +1677,131 @@ begin
  end;
 end;
 
+function PUCUUTF16Correct(const Str:TPUCUUTF16String):TPUCUUTF16String;
+var i,j:TPUCUInt32;
+    w:TPUCUUTF32Char;
+begin
+ result:='';
+ j:=0;
+ i:=1;
+ SetLength(result,length(Str)*2);
+ while i<=length(Str) do begin
+  w:=TPUCUUInt16(TPUCUUTF16Char(Str[i]));
+  inc(i);
+  if (i<=length(Str)) and ((w and $fc00)=$d800) and ((TPUCUUInt16(TPUCUUTF16Char(Str[i])) and $fc00)=$dc00) then begin
+   w:=(TPUCUUTF32Char(TPUCUUInt16(TPUCUUTF16Char(w and $3ff)) shl 10) or TPUCUUTF32Char(TPUCUUInt16(TPUCUUTF16Char(Str[i])) and $3ff))+$10000;
+   inc(i);
+  end;
+  if w<=$d7ff then begin
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16(w));
+  end else if w<=$dfff then begin
+   inc(j);
+   result[j]:=#$fffd;
+  end else if w<=$fffd then begin
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16(w));
+  end else if w<=$ffff then begin
+   inc(j);
+   result[j]:=#$fffd;
+  end else if w<=$10ffff then begin
+   dec(w,$10000);
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16((w shr 10) or $d800));
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16((w and $3ff) or $dc00));
+  end else begin
+   inc(j);
+   result[j]:=#$fffd;
+  end;
+ end;
+ SetLength(result,j);
+end;
+
+function PUCUUTF16UpperCase(const Str:TPUCUUTF16String):TPUCUUTF16String;
+var i,j:TPUCUInt32;
+    w:TPUCUUTF32Char;
+begin
+ result:='';
+ j:=0;
+ i:=1;
+ SetLength(result,length(Str)*2);
+ while i<=length(Str) do begin
+  w:=TPUCUUInt16(TPUCUUTF16Char(Str[i]));
+  inc(i);
+  if (i<=length(Str)) and ((w and $fc00)=$d800) and ((TPUCUUInt16(TPUCUUTF16Char(Str[i])) and $fc00)=$dc00) then begin
+   w:=(TPUCUUTF32Char(TPUCUUInt16(TPUCUUTF16Char(w and $3ff)) shl 10) or TPUCUUTF32Char(TPUCUUInt16(TPUCUUTF16Char(Str[i])) and $3ff))+$10000;
+   inc(i);
+  end;
+  w:=PUCUUnicodeToUpper(w);
+  if w<=$d7ff then begin
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16(w));
+  end else if w<=$dfff then begin
+   inc(j);
+   result[j]:=#$fffd;
+  end else if w<=$fffd then begin
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16(w));
+  end else if w<=$ffff then begin
+   inc(j);
+   result[j]:=#$fffd;
+  end else if w<=$10ffff then begin
+   dec(w,$10000);
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16((w shr 10) or $d800));
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16((w and $3ff) or $dc00));
+  end else begin
+   inc(j);
+   result[j]:=#$fffd;
+  end;
+ end;
+ SetLength(result,j);
+end;
+
+function PUCUUTF16LowerCase(const Str:TPUCUUTF16String):TPUCUUTF16String;
+var i,j:TPUCUInt32;
+    w:TPUCUUTF32Char;
+begin
+ result:='';
+ j:=0;
+ i:=1;
+ SetLength(result,length(Str)*2);
+ while i<=length(Str) do begin
+  w:=TPUCUUInt16(TPUCUUTF16Char(Str[i]));
+  inc(i);
+  if (i<=length(Str)) and ((w and $fc00)=$d800) and ((TPUCUUInt16(TPUCUUTF16Char(Str[i])) and $fc00)=$dc00) then begin
+   w:=(TPUCUUTF32Char(TPUCUUInt16(TPUCUUTF16Char(w and $3ff)) shl 10) or TPUCUUTF32Char(TPUCUUInt16(TPUCUUTF16Char(Str[i])) and $3ff))+$10000;
+   inc(i);
+  end;
+  w:=PUCUUnicodeToLower(w);
+  if w<=$d7ff then begin
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16(w));
+  end else if w<=$dfff then begin
+   inc(j);
+   result[j]:=#$fffd;
+  end else if w<=$fffd then begin
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16(w));
+  end else if w<=$ffff then begin
+   inc(j);
+   result[j]:=#$fffd;
+  end else if w<=$10ffff then begin
+   dec(w,$10000);
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16((w shr 10) or $d800));
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16((w and $3ff) or $dc00));
+  end else begin
+   inc(j);
+   result[j]:=#$fffd;
+  end;
+ end;
+ SetLength(result,j);
+end;
+
 function PUCUUTF32CharToUTF8(CharValue:TPUCUUTF32Char):TPUCURawByteString;
 var Data:array[0..{$ifdef PUCUStrictUTF8}3{$else}5{$endif}] of TPUCURawByteChar;
     ResultLen:TPUCUInt32;
@@ -1760,7 +1889,7 @@ end;
 
 function PUCUUTF32ToUTF8(const s:TPUCUUTF32String):TPUCUUTF8String;
 var i,j:TPUCUInt32;
-    u4c:TPUCUUTF32CHAR;
+    u4c:TPUCUUTF32Char;
 begin
  result:='';
  j:=0;
@@ -1774,7 +1903,7 @@ begin
    inc(j,3);
   end else if u4c<=$1fffff then begin
    inc(j,4);
-{$ifndef strictutf8}
+{$ifndef PUCUStrictUTF8}
   end else if u4c<=$3ffffff then begin
    inc(j,5);
   end else if u4c<=$7fffffff then begin
@@ -1806,7 +1935,7 @@ begin
    result[j+2]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
    result[j+3]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
    inc(j,4);
-{$ifndef strictutf8}
+{$ifndef PUCUStrictUTF8}
   end else if u4c<=$3ffffff then begin
    result[j]:=AnsiChar(TPUCUUInt8($f8 or ((u4c shr 24) and $03)));
    result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 18) and $3f)));
@@ -1853,7 +1982,7 @@ begin
   end else if ((i+3)<=length(s)) and ((b and $f8)=$f0) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) and ((TPUCUUInt8(s[i+3]) and $c0)=$80) then begin
    inc(i,4);
    inc(j);
-{$ifndef strictutf8}
+{$ifndef PUCUStrictUTF8}
   end else if ((i+4)<=length(s)) and ((b and $fc)=$f8) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) and ((TPUCUUInt8(s[i+3]) and $c0)=$80) and ((TPUCUUInt8(s[i+4]) and $c0)=$80) then begin
    inc(i,5);
    inc(j);
@@ -1890,7 +2019,7 @@ begin
    result[j]:=((TPUCUUInt8(s[i]) and $07) shl 18) or ((TPUCUUInt8(s[i+1]) and $3f) shl 12) or ((TPUCUUInt8(s[i+2]) and $3f) shl 6) or (TPUCUUInt8(s[i+3]) and $3f);
    inc(i,4);
    inc(j);
-{$ifndef strictutf8}
+{$ifndef PUCUStrictUTF8}
   end else if ((i+4)<=length(s)) and ((b and $fc)=$f8) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) and ((TPUCUUInt8(s[i+3]) and $c0)=$80) and ((TPUCUUInt8(s[i+4]) and $c0)=$80) then begin
    result[j]:=((TPUCUUInt8(s[i]) and $03) shl 24) or ((TPUCUUInt8(s[i+1]) and $3f) shl 18) or ((TPUCUUInt8(s[i+2]) and $3f) shl 12) or ((TPUCUUInt8(s[i+3]) and $3f) shl 6) or (TPUCUUInt8(s[i+4]) and $3f);
    inc(i,5);
@@ -2012,36 +2141,30 @@ end;
 
 function PUCUUTF16ToUTF8(const s:TPUCUUTF16STRING):TPUCUUTF8String;
 var i,j:TPUCUInt32;
-    w:TPUCUUInt16;
-    u4c:TPUCUUTF32Char;
+    w:TPUCUUInt32;
 begin
  result:='';
  j:=0;
  i:=1;
  while i<=length(s) do begin
   w:=TPUCUUInt16(s[i]);
-  if (w<=$d7ff) or (w>=$e000) then begin
-   u4c:=w;
-   inc(i);
-  end else if ((i+1)<=length(s)) and ((w>=$d800) and (w<=$dbff)) and ((TPUCUUInt16(s[i+1])>=$dc00) and (TPUCUUInt16(s[i+1])<=$dfff)) then begin
-   u4c:=(TPUCUUTF32CHAR(TPUCUUTF32CHAR(w and $3ff) shl 10) or TPUCUUTF32CHAR(TPUCUUInt16(s[i+1]) and $3ff))+$10000;
-   inc(i,2);
-  end else begin
-   u4c:=$fffd;
+  inc(i);
+  if (i<=length(s)) and ((w and $fc00)=$d800) and ((TPUCUUInt16(TPUCUUTF16Char(s[i])) and $fc00)=$dc00) then begin
+   w:=(TPUCUUTF32Char(TPUCUUTF32Char(w and $3ff) shl 10) or TPUCUUTF32Char(TPUCUUInt16(s[i]) and $3ff))+$10000;
    inc(i);
   end;
-  if u4c<=$7f then begin
+  if w<=$7f then begin
    inc(j);
-  end else if u4c<=$7ff then begin
+  end else if w<=$7ff then begin
    inc(j,2);
-  end else if u4c<=$ffff then begin
+  end else if w<=$ffff then begin
    inc(j,3);
-  end else if u4c<=$1fffff then begin
+  end else if w<=$1fffff then begin
    inc(j,4);
 {$ifndef PUCUStrictUTF8}
-  end else if u4c<=$3ffffff then begin
+  end else if w<=$3ffffff then begin
    inc(j,5);
-  end else if u4c<=$7fffffff then begin
+  end else if w<=$7fffffff then begin
    inc(j,6);
 {$endif}
   end else begin
@@ -2053,56 +2176,51 @@ begin
  i:=1;
  while i<=length(s) do begin
   w:=TPUCUUInt16(s[i]);
-  if (w<=$d7ff) or (w>=$e000) then begin
-   u4c:=w;
-   inc(i);
-  end else if ((i+1)<=length(s)) and ((w>=$d800) and (w<=$dbff)) and ((TPUCUUInt16(s[i+1])>=$dc00) and (TPUCUUInt16(s[i+1])<=$dfff)) then begin
-   u4c:=(TPUCUUTF32CHAR(TPUCUUTF32CHAR(w and $3ff) shl 10) or TPUCUUTF32CHAR(TPUCUUInt16(s[i+1]) and $3ff))+$10000;
-   inc(i,2);
-  end else begin
-   u4c:=$fffd;
+  inc(i);
+  if (i<=length(s)) and ((w and $fc00)=$d800) and ((TPUCUUInt16(TPUCUUTF16Char(s[i])) and $fc00)=$dc00) then begin
+   w:=(TPUCUUTF32Char(TPUCUUTF32Char(w and $3ff) shl 10) or TPUCUUTF32Char(TPUCUUInt16(s[i]) and $3ff))+$10000;
    inc(i);
   end;
-  if u4c<=$7f then begin
-   result[j]:=AnsiChar(TPUCUUInt8(u4c));
+  if w<=$7f then begin
+   result[j]:=AnsiChar(TPUCUUInt8(w));
    inc(j);
-  end else if u4c<=$7ff then begin
-   result[j]:=AnsiChar(TPUCUUInt8($c0 or ((u4c shr 6) and $1f)));
-   result[j+1]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+  end else if w<=$7ff then begin
+   result[j]:=AnsiChar(TPUCUUInt8($c0 or ((w shr 6) and $1f)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or (w and $3f)));
    inc(j,2);
-  end else if u4c<=$ffff then begin
-   result[j]:=AnsiChar(TPUCUUInt8($e0 or ((u4c shr 12) and $0f)));
-   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
-   result[j+2]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+  end else if w<=$ffff then begin
+   result[j]:=AnsiChar(TPUCUUInt8($e0 or ((w shr 12) and $0f)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((w shr 6) and $3f)));
+   result[j+2]:=AnsiChar(TPUCUUInt8($80 or (w and $3f)));
    inc(j,3);
-  end else if u4c<=$1fffff then begin
-   result[j]:=AnsiChar(TPUCUUInt8($f0 or ((u4c shr 18) and $07)));
-   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 12) and $3f)));
-   result[j+2]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
-   result[j+3]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+  end else if w<=$1fffff then begin
+   result[j]:=AnsiChar(TPUCUUInt8($f0 or ((w shr 18) and $07)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((w shr 12) and $3f)));
+   result[j+2]:=AnsiChar(TPUCUUInt8($80 or ((w shr 6) and $3f)));
+   result[j+3]:=AnsiChar(TPUCUUInt8($80 or (w and $3f)));
    inc(j,4);
 {$ifndef PUCUStrictUTF8}
-  end else if u4c<=$3ffffff then begin
-   result[j]:=AnsiChar(TPUCUUInt8($f8 or ((u4c shr 24) and $03)));
-   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 18) and $3f)));
-   result[j+2]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 12) and $3f)));
-   result[j+3]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
-   result[j+4]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+  end else if w<=$3ffffff then begin
+   result[j]:=AnsiChar(TPUCUUInt8($f8 or ((w shr 24) and $03)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((w shr 18) and $3f)));
+   result[j+2]:=AnsiChar(TPUCUUInt8($80 or ((w shr 12) and $3f)));
+   result[j+3]:=AnsiChar(TPUCUUInt8($80 or ((w shr 6) and $3f)));
+   result[j+4]:=AnsiChar(TPUCUUInt8($80 or (w and $3f)));
    inc(j,5);
-  end else if u4c<=$7fffffff then begin
-   result[j]:=AnsiChar(TPUCUUInt8($fc or ((u4c shr 30) and $01)));
-   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 24) and $3f)));
-   result[j+2]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 18) and $3f)));
-   result[j+3]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 12) and $3f)));
-   result[j+4]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
-   result[j+5]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+  end else if w<=$7fffffff then begin
+   result[j]:=AnsiChar(TPUCUUInt8($fc or ((w shr 30) and $01)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((w shr 24) and $3f)));
+   result[j+2]:=AnsiChar(TPUCUUInt8($80 or ((w shr 18) and $3f)));
+   result[j+3]:=AnsiChar(TPUCUUInt8($80 or ((w shr 12) and $3f)));
+   result[j+4]:=AnsiChar(TPUCUUInt8($80 or ((w shr 6) and $3f)));
+   result[j+5]:=AnsiChar(TPUCUUInt8($80 or (w and $3f)));
    inc(j,6);
 {$endif}
   end else begin
-   u4c:=$fffd;
-   result[j]:=AnsiChar(TPUCUUInt8($e0 or (u4c shr 12)));
-   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
-   result[j+2]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+   w:=$fffd;
+   result[j]:=AnsiChar(TPUCUUInt8($e0 or (w shr 12)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((w shr 6) and $3f)));
+   result[j+2]:=AnsiChar(TPUCUUInt8($80 or (w and $3f)));
    inc(j,3);
   end;
  end;
@@ -2110,8 +2228,7 @@ end;
 
 function PUCUUTF16ToUTF32(const Value:TPUCUUTF16String):TPUCUUTF32String;
 var i,j:TPUCUInt32;
-    v:TPUCUUInt32;
-    w:TPUCUUInt16;
+    w:TPUCUUInt32;
 begin
  i:=1;
  j:=0;
@@ -2120,19 +2237,13 @@ begin
   SetLength(result,length(Value));
   while i<=length(Value) do begin
    w:=TPUCUUInt16(Value[i]);
-   if (w<=$d7ff) or (w>=$e000) then begin
-    result[j]:=w;
-    inc(j);
-    inc(i);
-   end else if ((i+1)<=length(Value)) and ((w>=$d800) and (w<=$dbff)) and ((TPUCUUInt16(Value[i+1])>=$dc00) and (TPUCUUInt16(Value[i+1])<=$dfff)) then begin
-    result[j]:=(TPUCUUTF32Char(TPUCUUTF32Char(w and $3ff) shl 10) or TPUCUUTF32Char(TPUCUUInt16(Value[i+1]) and $3ff))+$10000;
-    inc(j);
-    inc(i,2);
-   end else begin
-    result[j]:=w; // $fffd;
-    inc(j);
+   inc(i);
+   if (i<=length(Value)) and ((w and $fc00)=$d800) and ((TPUCUUInt16(TPUCUUTF16Char(Value[i])) and $fc00)=$dc00) then begin
+    w:=(TPUCUUTF32Char(TPUCUUTF32Char(w and $3ff) shl 10) or TPUCUUTF32Char(TPUCUUInt16(Value[i]) and $3ff))+$10000;
     inc(i);
    end;
+   result[j]:=w;
+   inc(j);
   end;
  finally
   SetLength(result,j);
