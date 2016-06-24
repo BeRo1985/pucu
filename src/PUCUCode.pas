@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2016-06-25-00-50-0000                       *
+ *                        Version 2016-06-25-00-52-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -2426,6 +2426,13 @@ begin
    Bytes:=@Bytes^[0];
    InputLen:=pDataLength;
   end;
+ end else if assigned(CodePage) then begin
+  // Code page
+  BytesPerCodeUnit:=0;
+  BytesPerCodeUnitMask:=0;
+  LittleEndianBigEndian:=0;
+  Bytes:=@Bytes^[0];
+  InputLen:=pDataLength;
  end else if (pDataLength>=3) and (Bytes^[0]=$ef) and (Bytes^[1]=$bb) and (Bytes^[2]=$bf) then begin
   // UTF8
   BytesPerCodeUnit:=1;
@@ -2662,6 +2669,13 @@ begin
    Bytes:=@Bytes^[0];
    InputLen:=pDataLength;
   end;
+ end else if assigned(CodePage) then begin
+  // Code page
+  BytesPerCodeUnit:=0;
+  BytesPerCodeUnitMask:=0;
+  LittleEndianBigEndian:=0;
+  Bytes:=@Bytes^[0];
+  InputLen:=pDataLength;
  end else if (pDataLength>=3) and (Bytes^[0]=$ef) and (Bytes^[1]=$bb) and (Bytes^[2]=$bf) then begin
   // UTF8
   BytesPerCodeUnit:=1;
@@ -2837,6 +2851,13 @@ begin
    Bytes:=@Bytes^[0];
    InputLen:=pDataLength;
   end;
+ end else if assigned(CodePage) then begin
+  // Code page
+  BytesPerCodeUnit:=0;
+  BytesPerCodeUnitMask:=0;
+  LittleEndianBigEndian:=0;
+  Bytes:=@Bytes^[0];
+  InputLen:=pDataLength;
  end else if (pDataLength>=3) and (Bytes^[0]=$ef) and (Bytes^[1]=$bb) and (Bytes^[2]=$bf) then begin
   // UTF8
   BytesPerCodeUnit:=1;
