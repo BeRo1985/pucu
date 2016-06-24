@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2016-06-25-00-08-0000                       *
+ *                        Version 2016-06-25-00-21-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -386,6 +386,7 @@ type PPUCUInt8=^TPUCUInt8;
      TPUCUUTF32String=array of TPUCUUTF32Char;
 
 //>PUCUUnicodeData<//
+{$i PUCUCodePages.inc}
 
 function PUCUUnicodeGetCategoryFromTable(c:TPUCUUInt32):TPUCUUInt32; {$ifdef caninline}inline;{$endif}
 function PUCUUnicodeGetScriptFromTable(c:TPUCUUInt32):TPUCUUInt32; {$ifdef caninline}inline;{$endif}

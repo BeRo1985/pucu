@@ -672,6 +672,7 @@ type TPUCUUnicodeCharClass=class;
 var LowerUpperCaseUnicodeCharClass:TPUCUUnicodeCharClass;
 
     UnitSourceList:TStringList;
+    PUCUCodePagesSourceList:TStringList;
     FinalSourceList:TStringList;
     LineIndex:longint;
     Line:ansistring;
@@ -3239,6 +3240,19 @@ begin
     FinalSourceList.Delete(i);
     for j:=0 to UnitSourceList.Count-1 do begin
      FinalSourceList.Insert(i+j,UnitSourceList[j]);
+    end;
+   end;
+   i:=FinalSourceList.IndexOf('{$i PUCUCodePages.inc}');
+   if i>=0 then begin
+    FinalSourceList.Delete(i);
+    PUCUCodePagesSourceList:=TStringList.Create;
+    try
+     PUCUCodePagesSourceList.LoadFromFile('PUCUCodePages.inc');
+     for j:=0 to PUCUCodePagesSourceList.Count-1 do begin
+      FinalSourceList.Insert(i+j,PUCUCodePagesSourceList[j]);
+     end;
+    finally
+     PUCUCodePagesSourceList.Free;
     end;
    end;
    FinalSourceList.SaveToFile('PUCU.pas');
