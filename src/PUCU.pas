@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2016-06-03-23-23-0000                       *
+ *                        Version 2016-06-24-19-09-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -55,17 +55,10 @@ unit PUCU;
  {$ifdef cpui386}
   {$define cpu386}
  {$endif}
- {$ifdef cpuamd64}
-  {$define cpux86_64}
- {$endif}
  {$ifdef cpu386}
-  {$define cpux86}
-  {$define cpu32}
   {$asmmode intel}
  {$endif}
- {$ifdef cpux86_64}
-  {$define cpux64}
-  {$define cpu64}
+ {$ifdef cpuamd64}
   {$asmmode intel}
  {$endif}
  {$ifdef FPC_LITTLE_ENDIAN}
@@ -76,7 +69,7 @@ unit PUCU;
   {$endif}
  {$endif}
  {-$pic off}
- {$define caninline}
+ {$define CanInline}
  {$ifdef FPC_HAS_TYPE_EXTENDED}
   {$define HAS_TYPE_EXTENDED}
  {$else}
@@ -109,17 +102,9 @@ unit PUCU;
  {$ifndef cpu64}
   {$define cpu32}
  {$endif}
- {$ifdef cpux64}
-  {$define cpux86_64}
-  {$define cpu64}
- {$else}
-  {$ifdef cpu386}
-   {$define cpux86}
-   {$define cpu32}
-  {$endif}
- {$endif}
  {$define HAS_TYPE_EXTENDED}
  {$define HAS_TYPE_DOUBLE}
+ {$define HAS_TYPE_SINGLE}
  {$ifdef conditionalexpressions}
   {$if declared(RawByteString)}
    {$define HAS_TYPE_RAWBYTESTRING}
@@ -134,6 +119,161 @@ unit PUCU;
  {$else}
   {$undef HAS_TYPE_RAWBYTESTRING}
   {$undef HAS_TYPE_UTF8STRING}
+ {$endif}
+ {$ifndef BCB}
+  {$ifdef ver120}
+   {$define Delphi4or5}
+  {$endif}
+  {$ifdef ver130}
+   {$define Delphi4or5}
+  {$endif}
+  {$ifdef ver140}
+   {$define Delphi6}
+  {$endif}
+  {$ifdef ver150}
+   {$define Delphi7}
+  {$endif}
+  {$ifdef ver170}
+   {$define Delphi2005}
+  {$endif}
+ {$else}
+  {$ifdef ver120}
+   {$define Delphi4or5}
+   {$define BCB4}
+  {$endif}
+  {$ifdef ver130}
+   {$define Delphi4or5}
+  {$endif}
+ {$endif}
+ {$ifdef conditionalexpressions}
+  {$if CompilerVersion>=14.0}
+   {$if CompilerVersion=14.0}
+    {$define Delphi6}
+   {$ifend}
+   {$define Delphi6AndUp}
+  {$ifend}
+  {$if CompilerVersion>=15.0}
+   {$if CompilerVersion=15.0}
+    {$define Delphi7}
+   {$ifend}
+   {$define Delphi7AndUp}
+  {$ifend}
+  {$if CompilerVersion>=17.0}
+   {$if CompilerVersion=17.0}
+    {$define Delphi2005}
+   {$ifend}
+   {$define Delphi2005AndUp}
+  {$ifend}
+  {$if CompilerVersion>=18.0}
+   {$if CompilerVersion=18.0}
+    {$define BDS2006}
+    {$define Delphi2006}
+   {$ifend}
+   {$define Delphi2006AndUp}
+  {$ifend}
+  {$if CompilerVersion>=18.5}
+   {$if CompilerVersion=18.5}
+    {$define Delphi2007}
+   {$ifend}
+   {$define Delphi2007AndUp}
+  {$ifend}
+  {$if CompilerVersion=19.0}
+   {$define Delphi2007Net}
+  {$ifend}
+  {$if CompilerVersion>=20.0}
+   {$if CompilerVersion=20.0}
+    {$define Delphi2009}
+   {$ifend}
+   {$define Delphi2009AndUp}
+  {$ifend}
+  {$if CompilerVersion>=21.0}
+   {$if CompilerVersion=21.0}
+    {$define Delphi2010}
+   {$ifend}
+   {$define Delphi2010AndUp}
+  {$ifend}
+  {$if CompilerVersion>=22.0}
+   {$if CompilerVersion=22.0}
+    {$define DelphiXE}
+   {$ifend}
+   {$define DelphiXEAndUp}
+  {$ifend}
+  {$if CompilerVersion>=23.0}
+   {$if CompilerVersion=23.0}
+    {$define DelphiXE2}
+   {$ifend}
+   {$define DelphiXE2AndUp}
+  {$ifend}
+  {$if CompilerVersion>=24.0}
+   {$if CompilerVersion=24.0}
+    {$define DelphiXE3}
+   {$ifend}
+   {$define DelphiXE3AndUp}
+  {$ifend}
+  {$if CompilerVersion>=25.0}
+   {$if CompilerVersion=25.0}
+    {$define DelphiXE4}
+   {$ifend}
+   {$define DelphiXE4AndUp}
+  {$ifend}
+  {$if CompilerVersion>=26.0}
+   {$if CompilerVersion=26.0}
+    {$define DelphiXE5}
+   {$ifend}
+   {$define DelphiXE5AndUp}
+  {$ifend}
+  {$if CompilerVersion>=27.0}
+   {$if CompilerVersion=27.0}
+    {$define DelphiXE6}
+   {$ifend}
+   {$define DelphiXE6AndUp}
+  {$ifend}
+  {$if CompilerVersion>=28.0}
+   {$if CompilerVersion=28.0}
+    {$define DelphiXE7}
+   {$ifend}
+   {$define DelphiXE7AndUp}
+  {$ifend}
+  {$if CompilerVersion>=29.0}
+   {$if CompilerVersion=29.0}
+    {$define DelphiXE8}
+   {$ifend}
+   {$define DelphiXE8AndUp}
+  {$ifend}
+  {$if CompilerVersion>=30.0}
+   {$if CompilerVersion=30.0}
+    {$define Delphi10Seattle}
+   {$ifend}
+   {$define Delphi10SeattleAndUp}
+  {$ifend}
+  {$if CompilerVersion>=31.0}
+   {$if CompilerVersion=31.0}
+    {$define Delphi10Berlin}
+   {$ifend}
+   {$define Delphi10BerlinAndUp}
+  {$ifend}
+ {$endif}
+ {$ifndef Delphi4or5}
+  {$ifndef BCB}
+   {$define Delphi6AndUp}
+  {$endif}
+   {$ifndef Delphi6}
+    {$define BCB6OrDelphi7AndUp}
+    {$ifndef BCB}
+     {$define Delphi7AndUp}
+    {$endif}
+    {$ifndef BCB}
+     {$ifndef Delphi7}
+      {$ifndef Delphi2005}
+       {$define BDS2006AndUp}
+      {$endif}
+     {$endif}
+    {$endif}
+   {$endif}
+ {$endif}
+ {$ifdef Delphi6AndUp}
+  {$warn symbol_platform off}
+  {$warn symbol_deprecated off}
  {$endif}
 {$endif}
 {$ifdef win32}
@@ -170,30 +310,47 @@ const suDONOTKNOW=-1;
       ucACCEPT=0;
       ucERROR=16;
 
-type PPUCUQWord=^TPUCUQWord;
+type PPUCUInt8=^TPUCUInt8;
+     TPUCUInt8={$ifdef fpc}Int8{$else}ShortInt{$endif};
+
+     PPUCUUInt8=^TPUCUUInt8;
+     TPUCUUInt8={$ifdef fpc}UInt8{$else}Byte{$endif};
+
+     PPUCUInt16=^TPUCUInt16;
+     TPUCUInt16={$ifdef fpc}Int16{$else}SmallInt{$endif};
+
+     PPUCUUInt16=^TPUCUUInt16;
+     TPUCUUInt16={$ifdef fpc}UInt16{$else}Word{$endif};
+
+     PPUCUInt32=^TPUCUInt32;
+     TPUCUInt32={$ifdef fpc}Int32{$else}LongInt{$endif};
+
+     PPUCUUInt32=^TPUCUUInt32;
+     TPUCUUInt32={$ifdef fpc}UInt32{$else}LongWord{$endif};
+
+     PPUCUInt64=^TPUCUInt64;
+     TPUCUInt64=Int64;
+
+     PPUCUUInt64=^TPUCUUInt64;
+     TPUCUUInt64=UInt64;
+
      PPUCUPtrUInt=^TPUCUPtrUInt;
      PPUCUPtrInt=^TPUCUPtrInt;
 
 {$ifdef fpc}
-     TPUCUQWord=qword;
-
      TPUCUPtrUInt=PtrUInt;
      TPUCUPtrInt=PtrInt;
 {$else}
 {$if Declared(CompilerVersion) and (CompilerVersion>=23.0)}
-     TPUCUQWord=uint64;
-
      TPUCUPtrUInt=NativeUInt;
      TPUCUPtrInt=NativeInt;
 {$else}
-     TPUCUQWord=int64;
-
 {$ifdef cpu64}
-     TPUCUPtrUInt=TPUCUQWord;
+     TPUCUPtrUInt=UInt64;
      TPUCUPtrInt=int64;
 {$else}
-     TPUCUPtrUInt=longword;
-     TPUCUPtrInt=longint;
+     TPUCUPtrUInt=TPUCUUInt32;
+     TPUCUPtrInt=TPUCUInt32;
 {$endif}
 {$ifend}
 {$endif}
@@ -204,14 +361,30 @@ type PPUCUQWord=^TPUCUQWord;
      TPUCUNativeInt=TPUCUPtrInt;
 
      PPUCURawByteChar=PAnsiChar;
-     TPUCURawByteChar=ansichar;
+     TPUCURawByteChar=AnsiChar;
 
      PPUCURawByteCharSet=^TPUCURawByteCharSet;
      TPUCURawByteCharSet=set of TPUCURawByteChar;
 
+     PPUCURawByteString=^TPUCURawByteString;
      TPUCURawByteString={$ifdef HAS_TYPE_RAWBYTESTRING}RawByteString{$else}AnsiString{$endif};
 
+     PPUCUUTF8Char=PAnsiChar;
+     TPUCUUTF8Char=AnsiChar;
+
+     PPUCUUTF8String=^TPUCUUTF8String;
      TPUCUUTF8String={$ifdef HAS_TYPE_UTF8STRING}UTF8String{$else}AnsiString{$endif};
+
+     PPUCUUTF16Char={$ifdef fpc}PUnicodeChar{$else}PWideChar{$endif};
+     TPUCUUTF16Char={$ifdef fpc}UnicodeChar{$else}WideChar{$endif};
+
+     PPUCUUTF16String=^TPUCUUTF16String;
+     TPUCUUTF16String={$ifdef fpc}UnicodeString{$else}WideString{$endif};
+
+     PPUCUUTF32Char=^TPUCUUTF32Char;
+     TPUCUUTF32Char=TPUCUUInt32;
+
+     TPUCUUTF32String=array of TPUCUUTF32Char;
 
 type TPUCUUnicodeBlock=record
       Name:TPUCURawByteString;
@@ -32632,64 +32805,76 @@ const PUCUUTF8DFATransitions:array[byte] of byte=(
 16,
 16);
 
-function PUCUUnicodeGetCategoryFromTable(c:longword):longword; {$ifdef caninline}inline;{$endif}
-function PUCUUnicodeGetScriptFromTable(c:longword):longword; {$ifdef caninline}inline;{$endif}
-function PUCUUnicodeGetUpperCaseDeltaFromTable(c:longword):longint; {$ifdef caninline}inline;{$endif}
-function PUCUUnicodeGetLowerCaseDeltaFromTable(c:longword):longint; {$ifdef caninline}inline;{$endif}
-function PUCUUnicodeGetTitleCaseDeltaFromTable(c:longword):longint; {$ifdef caninline}inline;{$endif}
-function PUCUUnicodeIsWord(c:longword):boolean; {$ifdef caninline}inline;{$endif}
-function PUCUUnicodeIsIDBegin(c:longword):boolean; {$ifdef caninline}inline;{$endif}
-function PUCUUnicodeIsIDPart(c:longword):boolean; {$ifdef caninline}inline;{$endif}
-function PUCUUnicodeIsWhiteSpace(c:longword):boolean; {$ifdef caninline}inline;{$endif}
-function PUCUUnicodeToUpper(c:longword):longword; {$ifdef caninline}inline;{$endif}
-function PUCUUnicodeToLower(c:longword):longword; {$ifdef caninline}inline;{$endif}
-function PUCUUnicodeToTitle(c:longword):longword; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeGetCategoryFromTable(c:TPUCUUInt32):TPUCUUInt32; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeGetScriptFromTable(c:TPUCUUInt32):TPUCUUInt32; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeGetUpperCaseDeltaFromTable(c:TPUCUUInt32):TPUCUInt32; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeGetLowerCaseDeltaFromTable(c:TPUCUUInt32):TPUCUInt32; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeGetTitleCaseDeltaFromTable(c:TPUCUUInt32):TPUCUInt32; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeIsWord(c:TPUCUUInt32):boolean; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeIsIDBegin(c:TPUCUUInt32):boolean; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeIsIDPart(c:TPUCUUInt32):boolean; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeIsWhiteSpace(c:TPUCUUInt32):boolean; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeToUpper(c:TPUCUUInt32):TPUCUUInt32; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeToLower(c:TPUCUUInt32):TPUCUUInt32; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeToTitle(c:TPUCUUInt32):TPUCUUInt32; {$ifdef caninline}inline;{$endif}
 
-function PUCUUTF32CharToUTF8(CharValue:longword):TPUCURawByteString;
-function PUCUUTF32CharToUTF8Len(CharValue:longword):longint;
 function PUCUIsUTF8(const s:TPUCURawByteString):boolean;
 function PUCUUTF8Validate(const s:TPUCURawByteString):boolean;
-function PUCUUTF8Get(const s:TPUCURawByteString):longint;
-function PUCUUTF8PtrGet(const s:PPUCURawByteChar;Len:longint):longint;
-procedure PUCUUTF8SafeInc(const s:TPUCURawByteString;var CodeUnit:longint);
-procedure PUCUUTF8PtrSafeInc(const s:PPUCURawByteChar;var Len,CodeUnit:longint);
-procedure PUCUUTF8Inc(const s:TPUCURawByteString;var CodeUnit:longint);
-procedure PUCUUTF8PtrInc(const s:PPUCURawByteChar;Len:longint;var CodeUnit:longint);
-procedure PUCUUTF8Dec(const s:TPUCURawByteString;var CodeUnit:longint);
-procedure PUCUUTF8PtrDec(const s:PPUCURawByteChar;Len:longint;var CodeUnit:longint);
-procedure PUCUUTF8Delete(var s:TPUCURawByteString;CodeUnit:longint);
-function PUCUUTF8Length(const s:TPUCURawByteString):longint;{$ifdef cpu386}assembler; register;{$endif}
-function PUCUUTF8PtrLength(const s:TPUCURawByteString;Len:longint):longint;{$ifdef cpu386}assembler; register;{$endif}
-function PUCUUTF8LengthEx(const s:TPUCURawByteString):longint;
-function PUCUUTF8GetCodePoint(const s:TPUCURawByteString;CodeUnit:longint):longint;
-function PUCUUTF8PtrGetCodePoint(const s:PPUCURawByteChar;Len,CodeUnit:longint):longint;
-function PUCUUTF8GetCodeUnit(const s:TPUCURawByteString;CodePoint:longint):longint;
-function PUCUUTF8PtrGetCodeUnit(const s:TPUCURawByteString;Len,CodePoint:longint):longint;
-function PUCUUTF8CodeUnitGetChar(const s:TPUCURawByteString;CodeUnit:longint):longword;
-function PUCUUTF8PtrCodeUnitGetChar(const s:PPUCURawByteChar;Len,CodeUnit:longint):longword;
-function PUCUUTF8PtrCodeUnitGetCharFallback(const s:PPUCURawByteChar;Len,CodeUnit:longint):longword;
-function PUCUUTF8CodeUnitGetCharAndInc(const s:TPUCURawByteString;var CodeUnit:longint):longword;
-function PUCUUTF8PtrCodeUnitGetCharAndInc(const s:PPUCURawByteChar;Len:longint;var CodeUnit:longint):longword;
-function PUCUUTF8CodeUnitGetCharFallback(const s:TPUCURawByteString;CodeUnit:longint):longword;
-function PUCUUTF8CodeUnitGetCharAndIncFallback(const s:TPUCURawByteString;var CodeUnit:longint):longword;
-function PUCUUTF8PtrCodeUnitGetCharAndIncFallback(const s:PPUCURawByteChar;const Len:longint;var CodeUnit:longint):longword;
-function PUCUUTF8CodePointGetChar(const s:TPUCURawByteString;CodePoint:longint;Fallback:boolean=false):longword;
-function PUCUUTF8GetCharLen(const s:TPUCURawByteString;i:longint):longword;
-function PUCUUTF8Pos(const FindStr,InStr:TPUCURawByteString):longint;
-function PUCUUTF8Copy(const Str:TPUCURawByteString;Start,Len:longint):TPUCURawByteString;
+function PUCUUTF8Get(const s:TPUCURawByteString):TPUCUInt32;
+function PUCUUTF8PtrGet(const s:PPUCURawByteChar;Len:TPUCUInt32):TPUCUInt32;
+procedure PUCUUTF8SafeInc(const s:TPUCURawByteString;var CodeUnit:TPUCUInt32);
+procedure PUCUUTF8PtrSafeInc(const s:PPUCURawByteChar;var Len,CodeUnit:TPUCUInt32);
+procedure PUCUUTF8Inc(const s:TPUCURawByteString;var CodeUnit:TPUCUInt32);
+procedure PUCUUTF8PtrInc(const s:PPUCURawByteChar;Len:TPUCUInt32;var CodeUnit:TPUCUInt32);
+procedure PUCUUTF8Dec(const s:TPUCURawByteString;var CodeUnit:TPUCUInt32);
+procedure PUCUUTF8PtrDec(const s:PPUCURawByteChar;Len:TPUCUInt32;var CodeUnit:TPUCUInt32);
+procedure PUCUUTF8Delete(var s:TPUCURawByteString;CodeUnit:TPUCUInt32);
+function PUCUUTF8Length(const s:TPUCURawByteString):TPUCUInt32;{$ifdef cpu386}assembler; register;{$endif}
+function PUCUUTF8PtrLength(const s:TPUCURawByteString;Len:TPUCUInt32):TPUCUInt32;{$ifdef cpu386}assembler; register;{$endif}
+function PUCUUTF8LengthEx(const s:TPUCURawByteString):TPUCUInt32;
+function PUCUUTF8GetCodePoint(const s:TPUCURawByteString;CodeUnit:TPUCUInt32):TPUCUInt32;
+function PUCUUTF8PtrGetCodePoint(const s:PPUCURawByteChar;Len,CodeUnit:TPUCUInt32):TPUCUInt32;
+function PUCUUTF8GetCodeUnit(const s:TPUCURawByteString;CodePoint:TPUCUInt32):TPUCUInt32;
+function PUCUUTF8PtrGetCodeUnit(const s:TPUCURawByteString;Len,CodePoint:TPUCUInt32):TPUCUInt32;
+function PUCUUTF8CodeUnitGetChar(const s:TPUCURawByteString;CodeUnit:TPUCUInt32):TPUCUUInt32;
+function PUCUUTF8PtrCodeUnitGetChar(const s:PPUCURawByteChar;Len,CodeUnit:TPUCUInt32):TPUCUUInt32;
+function PUCUUTF8PtrCodeUnitGetCharFallback(const s:PPUCURawByteChar;Len,CodeUnit:TPUCUInt32):TPUCUUInt32;
+function PUCUUTF8CodeUnitGetCharAndInc(const s:TPUCURawByteString;var CodeUnit:TPUCUInt32):TPUCUUInt32;
+function PUCUUTF8PtrCodeUnitGetCharAndInc(const s:PPUCURawByteChar;Len:TPUCUInt32;var CodeUnit:TPUCUInt32):TPUCUUInt32;
+function PUCUUTF8CodeUnitGetCharFallback(const s:TPUCURawByteString;CodeUnit:TPUCUInt32):TPUCUUInt32;
+function PUCUUTF8CodeUnitGetCharAndIncFallback(const s:TPUCURawByteString;var CodeUnit:TPUCUInt32):TPUCUUInt32;
+function PUCUUTF8PtrCodeUnitGetCharAndIncFallback(const s:PPUCURawByteChar;const Len:TPUCUInt32;var CodeUnit:TPUCUInt32):TPUCUUInt32;
+function PUCUUTF8CodePointGetChar(const s:TPUCURawByteString;CodePoint:TPUCUInt32;Fallback:boolean=false):TPUCUUInt32;
+function PUCUUTF8GetCharLen(const s:TPUCURawByteString;i:TPUCUInt32):TPUCUUInt32;
+function PUCUUTF8Pos(const FindStr,InStr:TPUCURawByteString):TPUCUInt32;
+function PUCUUTF8Copy(const Str:TPUCURawByteString;Start,Len:TPUCUInt32):TPUCURawByteString;
 function PUCUUTF8UpperCase(const Str:TPUCURawByteString):TPUCURawByteString;
 function PUCUUTF8LowerCase(const Str:TPUCURawByteString):TPUCURawByteString;
 function PUCUUTF8Trim(const Str:TPUCURawByteString):TPUCURawByteString;
 function PUCUUTF8Correct(const Str:TPUCURawByteString):TPUCURawByteString;
 function PUCUUTF8FromLatin1(const Str:TPUCURawByteString):TPUCURawByteString;
-function PUCUUTF8LevenshteinDistance(const s,t:TPUCURawByteString):longint;
-function PUCUUTF8DamerauLevenshteinDistance(const s,t:TPUCURawByteString):longint;
-function PUCUStringLength(const s:TPUCURawByteString):longint;
+function PUCUUTF8LevenshteinDistance(const s,t:TPUCURawByteString):TPUCUInt32;
+function PUCUUTF8DamerauLevenshteinDistance(const s,t:TPUCURawByteString):TPUCUInt32;
+function PUCUStringLength(const s:TPUCURawByteString):TPUCUInt32;
+
+function PUCUUTF32CharToUTF8(CharValue:TPUCUUTF32Char):TPUCURawByteString;
+function PUCUUTF32CharToUTF8Len(CharValue:TPUCUUTF32Char):TPUCUInt32;
+
+function PUCUUTF32ToUTF8(const s:TPUCUUTF32String):TPUCUUTF8String;
+function PUCUUTF8ToUTF32(const s:TPUCUUTF8String):TPUCUUTF32String;
+
+function PUCUUTF8ToUTF16(const s:TPUCUUTF8String):TPUCUUTF16STRING;
+function PUCUUTF16ToUTF8(const s:TPUCUUTF16STRING):TPUCUUTF8String;
+
+function PUCUUTF16ToUTF32(const Value:TPUCUUTF16String):TPUCUUTF32String;
+function PUCUUTF32ToUTF16(const Value:TPUCUUTF32String):TPUCUUTF16String;
+
+function PUCUUTF32CharToUTF16(const Value:TPUCUUTF32Char):TPUCUUTF16String;
 
 implementation
 
-function PUCUUnicodeGetCategoryFromTable(c:longword):longword; {$ifdef caninline}inline;{$endif}
-var Index:longword;
+function PUCUUnicodeGetCategoryFromTable(c:TPUCUUInt32):TPUCUUInt32; {$ifdef caninline}inline;{$endif}
+var Index:TPUCUUInt32;
 begin
  if c<=$10ffff then begin
   Index:=c shr PUCUUnicodeCategoryArrayBlockBits;
@@ -32699,8 +32884,8 @@ begin
  end;
 end;
 
-function PUCUUnicodeGetScriptFromTable(c:longword):longword; {$ifdef caninline}inline;{$endif}
-var Index:longword;
+function PUCUUnicodeGetScriptFromTable(c:TPUCUUInt32):TPUCUUInt32; {$ifdef caninline}inline;{$endif}
+var Index:TPUCUUInt32;
 begin
  if c<=$10ffff then begin
   Index:=c shr PUCUUnicodeScriptArrayBlockBits;
@@ -32710,8 +32895,8 @@ begin
  end;
 end;
 
-function PUCUUnicodeGetUpperCaseDeltaFromTable(c:longword):longint; {$ifdef caninline}inline;{$endif}
-var Index:longword;
+function PUCUUnicodeGetUpperCaseDeltaFromTable(c:TPUCUUInt32):TPUCUInt32; {$ifdef caninline}inline;{$endif}
+var Index:TPUCUUInt32;
 begin
  if c<=$10ffff then begin
   Index:=c shr PUCUUnicodeUpperCaseDeltaArrayBlockBits;
@@ -32721,8 +32906,8 @@ begin
  end;
 end;
 
-function PUCUUnicodeGetLowerCaseDeltaFromTable(c:longword):longint; {$ifdef caninline}inline;{$endif}
-var Index:longword;
+function PUCUUnicodeGetLowerCaseDeltaFromTable(c:TPUCUUInt32):TPUCUInt32; {$ifdef caninline}inline;{$endif}
+var Index:TPUCUUInt32;
 begin
  if c<=$10ffff then begin
   Index:=c shr PUCUUnicodeLowerCaseDeltaArrayBlockBits;
@@ -32732,8 +32917,8 @@ begin
  end;
 end;
 
-function PUCUUnicodeGetTitleCaseDeltaFromTable(c:longword):longint; {$ifdef caninline}inline;{$endif}
-var Index:longword;
+function PUCUUnicodeGetTitleCaseDeltaFromTable(c:TPUCUUInt32):TPUCUInt32; {$ifdef caninline}inline;{$endif}
+var Index:TPUCUUInt32;
 begin
  if c<=$10ffff then begin
   Index:=c shr PUCUUnicodeTitleCaseDeltaArrayBlockBits;
@@ -32743,130 +32928,45 @@ begin
  end;
 end;
 
-function PUCUUnicodeIsWord(c:longword):boolean; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeIsWord(c:TPUCUUInt32):boolean; {$ifdef caninline}inline;{$endif}
 begin
  result:=(PUCUUnicodeGetCategoryFromTable(c) in [PUCUUnicodeCategoryLu,PUCUUnicodeCategoryLl,PUCUUnicodeCategoryLt,PUCUUnicodeCategoryLm,PUCUUnicodeCategoryLo,PUCUUnicodeCategoryNd,PUCUUnicodeCategoryNl,PUCUUnicodeCategoryNo,PUCUUnicodeCategoryPc]) or (c=ord('_'));
 end;
 
-function PUCUUnicodeIsIDBegin(c:longword):boolean; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeIsIDBegin(c:TPUCUUInt32):boolean; {$ifdef caninline}inline;{$endif}
 begin
  result:=(PUCUUnicodeGetCategoryFromTable(c) in [PUCUUnicodeCategoryLu,PUCUUnicodeCategoryLl,PUCUUnicodeCategoryLt,PUCUUnicodeCategoryLm,PUCUUnicodeCategoryLo,PUCUUnicodeCategoryNl,PUCUUnicodeCategoryNo,PUCUUnicodeCategoryPc]) or (c=ord('_'));
 end;
 
-function PUCUUnicodeIsIDPart(c:longword):boolean; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeIsIDPart(c:TPUCUUInt32):boolean; {$ifdef caninline}inline;{$endif}
 begin
  result:=(PUCUUnicodeGetCategoryFromTable(c) in [PUCUUnicodeCategoryLu,PUCUUnicodeCategoryLl,PUCUUnicodeCategoryLt,PUCUUnicodeCategoryLm,PUCUUnicodeCategoryLo,PUCUUnicodeCategoryNd,PUCUUnicodeCategoryNl,PUCUUnicodeCategoryNo,PUCUUnicodeCategoryPc]) or (c=ord('_'));
 end;
 
-function PUCUUnicodeIsWhiteSpace(c:longword):boolean; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeIsWhiteSpace(c:TPUCUUInt32):boolean; {$ifdef caninline}inline;{$endif}
 begin
 //result:=UnicodeGetCategoryFromTable(c) in [PUCUUnicodeCategoryZs,PUCUUnicodeCategoryZp,PUCUUnicodeCategoryZl];
  result:=((c>=$0009) and (c<=$000d)) or (c=$0020) or (c=$00a0) or (c=$1680) or (c=$180e) or ((c>=$2000) and (c<=$200b)) or (c=$2028) or (c=$2029) or (c=$202f) or (c=$205f) or (c=$3000) or (c=$feff) or (c=$fffe);
 end;
 
-function PUCUUnicodeToUpper(c:longword):longword; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeToUpper(c:TPUCUUInt32):TPUCUUInt32; {$ifdef caninline}inline;{$endif}
 begin
- result:=longword(longint(longint(c)+PUCUUnicodeGetUpperCaseDeltaFromTable(c)));
+ result:=TPUCUUInt32(TPUCUInt32(TPUCUInt32(c)+PUCUUnicodeGetUpperCaseDeltaFromTable(c)));
 end;
 
-function PUCUUnicodeToLower(c:longword):longword; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeToLower(c:TPUCUUInt32):TPUCUUInt32; {$ifdef caninline}inline;{$endif}
 begin
- result:=longword(longint(longint(c)+PUCUUnicodeGetLowerCaseDeltaFromTable(c)));
+ result:=TPUCUUInt32(TPUCUInt32(TPUCUInt32(c)+PUCUUnicodeGetLowerCaseDeltaFromTable(c)));
 end;
 
-function PUCUUnicodeToTitle(c:longword):longword; {$ifdef caninline}inline;{$endif}
+function PUCUUnicodeToTitle(c:TPUCUUInt32):TPUCUUInt32; {$ifdef caninline}inline;{$endif}
 begin
- result:=longword(longint(longint(c)+PUCUUnicodeGetTitleCaseDeltaFromTable(c)));
-end;
-
-function PUCUUTF32CharToUTF8(CharValue:longword):TPUCURawByteString;
-var Data:array[0..{$ifdef PUCUStrictUTF8}3{$else}5{$endif}] of TPUCURawByteChar;
-    ResultLen:longint;
-begin
- if CharValue=0 then begin
-  result:=#0;
- end else begin
-  if CharValue<=$7f then begin
-   Data[0]:=TPUCURawByteChar(byte(CharValue));
-   ResultLen:=1;
-  end else if CharValue<=$7ff then begin
-   Data[0]:=TPUCURawByteChar(byte($c0 or ((CharValue shr 6) and $1f)));
-   Data[1]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
-   ResultLen:=2;
-{$ifdef PUCUStrictUTF8}
-  end else if CharValue<=$d7ff then begin
-   Data[0]:=TPUCURawByteChar(byte($e0 or ((CharValue shr 12) and $0f)));
-   Data[1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-   Data[2]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
-   ResultLen:=3;
-  end else if CharValue<=$dfff then begin
-   Data[0]:=#$ef; // $fffd
-   Data[1]:=#$bf;
-   Data[2]:=#$bd;
-   ResultLen:=3;
-{$endif}
-  end else if CharValue<=$ffff then begin
-   Data[0]:=TPUCURawByteChar(byte($e0 or ((CharValue shr 12) and $0f)));
-   Data[1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-   Data[2]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
-   ResultLen:=3;
-  end else if CharValue<=$1fffff then begin
-   Data[0]:=TPUCURawByteChar(byte($f0 or ((CharValue shr 18) and $07)));
-   Data[1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 12) and $3f)));
-   Data[2]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-   Data[3]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
-   ResultLen:=4;
-{$ifndef PUCUStrictUTF8}
-  end else if CharValue<=$3ffffff then begin
-   Data[0]:=TPUCURawByteChar(byte($f8 or ((CharValue shr 24) and $03)));
-   Data[1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 18) and $3f)));
-   Data[2]:=TPUCURawByteChar(byte($80 or ((CharValue shr 12) and $3f)));
-   Data[3]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-   Data[4]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
-   ResultLen:=5;
-  end else if CharValue<=$7fffffff then begin
-   Data[0]:=TPUCURawByteChar(byte($fc or ((CharValue shr 30) and $01)));
-   Data[1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 24) and $3f)));
-   Data[2]:=TPUCURawByteChar(byte($80 or ((CharValue shr 18) and $3f)));
-   Data[3]:=TPUCURawByteChar(byte($80 or ((CharValue shr 12) and $3f)));
-   Data[4]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-   Data[5]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
-   ResultLen:=6;
-{$endif}
-  end else begin
-   Data[0]:=#$ef; // $fffd
-   Data[1]:=#$bf;
-   Data[2]:=#$bd;
-   ResultLen:=3;
-  end;
-  SetString(result,PPUCURawByteChar(@Data[0]),ResultLen);
- end;
-end;
-
-function PUCUUTF32CharToUTF8Len(CharValue:longword):longint;
-begin
- if CharValue<=$7f then begin
-  result:=1;
- end else if CharValue<=$7ff then begin
-  result:=2;
- end else if CharValue<=$ffff then begin
-  result:=3;
- end else if CharValue<=$1fffff then begin
-  result:=4;
-{$ifndef PUCUStrictUTF8}
- end else if CharValue<=$3ffffff then begin
-  result:=5;
- end else if CharValue<=$7fffffff then begin
-  result:=6;
-{$endif}
- end else begin
-  result:=3;
- end;
+ result:=TPUCUUInt32(TPUCUInt32(TPUCUInt32(c)+PUCUUnicodeGetTitleCaseDeltaFromTable(c)));
 end;
 
 function PUCUIsUTF8(const s:TPUCURawByteString):boolean;
-var CodeUnit,CodePoints:longint;
-    State:longword;
+var CodeUnit,CodePoints:TPUCUInt32;
+    State:TPUCUUInt32;
 begin
  State:=ucACCEPT;
  CodePoints:=0;
@@ -32886,8 +32986,8 @@ begin
 end;
 
 function PUCUUTF8Validate(const s:TPUCURawByteString):boolean;
-var CodeUnit:longint;
-    State:longword;
+var CodeUnit:TPUCUInt32;
+    State:TPUCUUInt32;
 begin
  State:=ucACCEPT;
  for CodeUnit:=1 to length(s) do begin
@@ -32900,9 +33000,9 @@ begin
  result:=State=ucACCEPT;
 end;
 
-function PUCUUTF8Get(const s:TPUCURawByteString):longint;
-var CodeUnit,CodePoints:longint;
-    State:longword;
+function PUCUUTF8Get(const s:TPUCURawByteString):TPUCUInt32;
+var CodeUnit,CodePoints:TPUCUInt32;
+    State:TPUCUUInt32;
 begin
  State:=ucACCEPT;
  CodePoints:=0;
@@ -32929,9 +33029,9 @@ begin
  end;
 end;
 
-function PUCUUTF8PtrGet(const s:PPUCURawByteChar;Len:longint):longint;
-var CodeUnit,CodePoints:longint;
-    State:longword;
+function PUCUUTF8PtrGet(const s:PPUCURawByteChar;Len:TPUCUInt32):TPUCUInt32;
+var CodeUnit,CodePoints:TPUCUInt32;
+    State:TPUCUUInt32;
 begin
  State:=ucACCEPT;
  CodePoints:=0;
@@ -32958,9 +33058,9 @@ begin
  end;
 end;
 
-procedure PUCUUTF8SafeInc(const s:TPUCURawByteString;var CodeUnit:longint);
-var Len:longint;
-    StartCodeUnit,State:longword;
+procedure PUCUUTF8SafeInc(const s:TPUCURawByteString;var CodeUnit:TPUCUInt32);
+var Len:TPUCUInt32;
+    StartCodeUnit,State:TPUCUUInt32;
 begin
  Len:=length(s);
  if CodeUnit>0 then begin
@@ -32979,8 +33079,8 @@ begin
  end;
 end;
 
-procedure PUCUUTF8PtrSafeInc(const s:PPUCURawByteChar;var Len,CodeUnit:longint);
-var StartCodeUnit,State:longword;
+procedure PUCUUTF8PtrSafeInc(const s:PPUCURawByteChar;var Len,CodeUnit:TPUCUInt32);
+var StartCodeUnit,State:TPUCUUInt32;
 begin
  if CodeUnit>=0 then begin
   StartCodeUnit:=CodeUnit;
@@ -32998,21 +33098,21 @@ begin
  end;
 end;
 
-procedure PUCUUTF8Inc(const s:TPUCURawByteString;var CodeUnit:longint);
+procedure PUCUUTF8Inc(const s:TPUCURawByteString;var CodeUnit:TPUCUInt32);
 begin
  if (CodeUnit>0) and (CodeUnit<=length(s)) then begin
   inc(CodeUnit,PUCUUTF8CharSteps[s[CodeUnit]]);
  end;
 end;
 
-procedure PUCUUTF8PtrInc(const s:PPUCURawByteChar;Len:longint;var CodeUnit:longint);
+procedure PUCUUTF8PtrInc(const s:PPUCURawByteChar;Len:TPUCUInt32;var CodeUnit:TPUCUInt32);
 begin
  if (CodeUnit>=0) and (CodeUnit<Len) then begin
   inc(CodeUnit,PUCUUTF8CharSteps[s[CodeUnit]]);
  end;
 end;
 
-procedure PUCUUTF8Dec(const s:TPUCURawByteString;var CodeUnit:longint);
+procedure PUCUUTF8Dec(const s:TPUCURawByteString;var CodeUnit:TPUCUInt32);
 begin
  if (CodeUnit>=1) and (CodeUnit<=(length(s)+1)) then begin
   dec(CodeUnit);
@@ -33026,7 +33126,7 @@ begin
  end;
 end;
 
-procedure PUCUUTF8PtrDec(const s:PPUCURawByteChar;Len:longint;var CodeUnit:longint);
+procedure PUCUUTF8PtrDec(const s:PPUCURawByteChar;Len:TPUCUInt32;var CodeUnit:TPUCUInt32);
 begin
  if (CodeUnit>0) and (CodeUnit<=Len) then begin
   dec(CodeUnit);
@@ -33040,7 +33140,7 @@ begin
  end;
 end;
 
-procedure PUCUUTF8Delete(var s:TPUCURawByteString;CodeUnit:longint);
+procedure PUCUUTF8Delete(var s:TPUCURawByteString;CodeUnit:TPUCUInt32);
 begin
  if (CodeUnit>=1) and (CodeUnit<=length(s)) then begin
   Delete(s,CodeUnit,1);
@@ -33050,7 +33150,7 @@ begin
  end;
 end;
 
-function PUCUUTF8Length(const s:TPUCURawByteString):longint; {$ifdef cpu386} assembler; register;
+function PUCUUTF8Length(const s:TPUCURawByteString):TPUCUInt32; {$ifdef cpu386} assembler; register;
 asm
  test eax,eax
  jz @End
@@ -33076,18 +33176,18 @@ asm
  @End:
 end;
 {$else}
-var CodeUnit:longint;
+var CodeUnit:TPUCUInt32;
 begin
  result:=0;
  for CodeUnit:=1 to length(s) do begin
-  if (byte(s[CodeUnit]) and $c0)<>$80 then begin
+  if (TPUCUUInt8(s[CodeUnit]) and $c0)<>$80 then begin
    inc(result);
   end;
  end;
 end;
 {$endif}
 
-function PUCUUTF8PtrLength(const s:TPUCURawByteString;Len:longint):longint;
+function PUCUUTF8PtrLength(const s:TPUCURawByteString;Len:TPUCUInt32):TPUCUInt32;
 {$ifdef cpu386} assembler; register;
 asm
  test eax,eax
@@ -33114,20 +33214,20 @@ asm
  @End:
 end;
 {$else}
-var CodeUnit:longint;
+var CodeUnit:TPUCUInt32;
 begin
  result:=0;
  for CodeUnit:=0 to Len-1 do begin
-  if (byte(s[CodeUnit]) and $c0)<>$80 then begin
+  if (TPUCUUInt8(s[CodeUnit]) and $c0)<>$80 then begin
    inc(result);
   end;
  end;
 end;
 {$endif}
 
-function PUCUUTF8LengthEx(const s:TPUCURawByteString):longint;
-var State:longword;
-    CodeUnit:longint;
+function PUCUUTF8LengthEx(const s:TPUCURawByteString):TPUCUInt32;
+var State:TPUCUUInt32;
+    CodeUnit:TPUCUInt32;
 begin
  result:=0;
  State:=ucACCEPT;
@@ -33148,8 +33248,8 @@ begin
  end;
 end;
 
-function PUCUUTF8GetCodePoint(const s:TPUCURawByteString;CodeUnit:longint):longint;
-var CurrentCodeUnit,Len:longint;
+function PUCUUTF8GetCodePoint(const s:TPUCURawByteString;CodeUnit:TPUCUInt32):TPUCUInt32;
+var CurrentCodeUnit,Len:TPUCUInt32;
 begin
  if CodeUnit<1 then begin
   result:=-1;
@@ -33164,8 +33264,8 @@ begin
  end;
 end;
 
-function PUCUUTF8PtrGetCodePoint(const s:PPUCURawByteChar;Len,CodeUnit:longint):longint;
-var CurrentCodeUnit:longint;
+function PUCUUTF8PtrGetCodePoint(const s:PPUCURawByteChar;Len,CodeUnit:TPUCUInt32):TPUCUInt32;
+var CurrentCodeUnit:TPUCUInt32;
 begin
  result:=-1;
  if CodeUnit<0 then begin
@@ -33177,8 +33277,8 @@ begin
  end;
 end;
 
-function PUCUUTF8GetCodeUnit(const s:TPUCURawByteString;CodePoint:longint):longint;
-var CurrentCodePoint,Len:longint;
+function PUCUUTF8GetCodeUnit(const s:TPUCURawByteString;CodePoint:TPUCUInt32):TPUCUInt32;
+var CurrentCodePoint,Len:TPUCUInt32;
 begin
  if CodePoint<0 then begin
   result:=0;
@@ -33193,8 +33293,8 @@ begin
  end;
 end;
 
-function PUCUUTF8PtrGetCodeUnit(const s:TPUCURawByteString;Len,CodePoint:longint):longint;
-var CurrentCodePoint:longint;
+function PUCUUTF8PtrGetCodeUnit(const s:TPUCURawByteString;Len,CodePoint:TPUCUInt32):TPUCUInt32;
+var CurrentCodePoint:TPUCUInt32;
 begin
  result:=-1;
  if CodePoint>=0 then begin
@@ -33208,14 +33308,14 @@ begin
  end;
 end;
 
-function PUCUUTF8CodeUnitGetChar(const s:TPUCURawByteString;CodeUnit:longint):longword;
-var Value,CharClass,State:longword;
+function PUCUUTF8CodeUnitGetChar(const s:TPUCURawByteString;CodeUnit:TPUCUInt32):TPUCUUInt32;
+var Value,CharClass,State:TPUCUUInt32;
 begin
  result:=0;
  if (CodeUnit>0) and (CodeUnit<=length(s)) then begin
   State:=ucACCEPT;
   for CodeUnit:=CodeUnit to length(s) do begin
-   Value:=byte(TPUCURawByteChar(s[CodeUnit]));
+   Value:=TPUCUUInt8(TPUCURawByteChar(s[CodeUnit]));
    CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
    if State=ucACCEPT then begin
     result:=Value and ($ff shr CharClass);
@@ -33233,14 +33333,14 @@ begin
  end;
 end;
 
-function PUCUUTF8PtrCodeUnitGetChar(const s:PPUCURawByteChar;Len,CodeUnit:longint):longword;
-var Value,CharClass,State:longword;
+function PUCUUTF8PtrCodeUnitGetChar(const s:PPUCURawByteChar;Len,CodeUnit:TPUCUInt32):TPUCUUInt32;
+var Value,CharClass,State:TPUCUUInt32;
 begin
  result:=0;
  if (CodeUnit>=0) and (CodeUnit<Len) then begin
   State:=ucACCEPT;
   for CodeUnit:=CodeUnit to Len-1 do begin
-   Value:=byte(TPUCURawByteChar(s[CodeUnit]));
+   Value:=TPUCUUInt8(TPUCURawByteChar(s[CodeUnit]));
    CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
    if State=ucACCEPT then begin
     result:=Value and ($ff shr CharClass);
@@ -33258,16 +33358,16 @@ begin
  end;
 end;
 
-function PUCUUTF8PtrCodeUnitGetCharFallback(const s:PPUCURawByteChar;Len,CodeUnit:longint):longword;
-var Value,CharClass,State:longword;
-    StartCodeUnit:longint;
+function PUCUUTF8PtrCodeUnitGetCharFallback(const s:PPUCURawByteChar;Len,CodeUnit:TPUCUInt32):TPUCUUInt32;
+var Value,CharClass,State:TPUCUUInt32;
+    StartCodeUnit:TPUCUInt32;
 begin
  result:=0;
  if (CodeUnit>=0) and (CodeUnit<Len) then begin
   StartCodeUnit:=CodeUnit;
   State:=ucACCEPT;
   for CodeUnit:=CodeUnit to Len-1 do begin
-   Value:=byte(TPUCURawByteChar(s[CodeUnit]));
+   Value:=TPUCUUInt8(TPUCURawByteChar(s[CodeUnit]));
    CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
    if State=ucACCEPT then begin
     result:=Value and ($ff shr CharClass);
@@ -33280,21 +33380,21 @@ begin
    end;
   end;
   if State<>ucACCEPT then begin
-   result:=byte(TPUCURawByteChar(s[StartCodeUnit]));
+   result:=TPUCUUInt8(TPUCURawByteChar(s[StartCodeUnit]));
   end;
  end;
 end;
 
-function PUCUUTF8CodeUnitGetCharAndInc(const s:TPUCURawByteString;var CodeUnit:longint):longword;
-var Len:longint;
-    Value,CharClass,State:longword;
+function PUCUUTF8CodeUnitGetCharAndInc(const s:TPUCURawByteString;var CodeUnit:TPUCUInt32):TPUCUUInt32;
+var Len:TPUCUInt32;
+    Value,CharClass,State:TPUCUUInt32;
 begin
  result:=0;
  Len:=length(s);
  if (CodeUnit>0) and (CodeUnit<=Len) then begin
   State:=ucACCEPT;
   while CodeUnit<=Len do begin
-   Value:=byte(TPUCURawByteChar(s[CodeUnit]));
+   Value:=TPUCUUInt8(TPUCURawByteChar(s[CodeUnit]));
    inc(CodeUnit);
    CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
    if State=ucACCEPT then begin
@@ -33313,14 +33413,14 @@ begin
  end;
 end;
 
-function PUCUUTF8PtrCodeUnitGetCharAndInc(const s:PPUCURawByteChar;Len:longint;var CodeUnit:longint):longword;
-var Value,CharClass,State:longword;
+function PUCUUTF8PtrCodeUnitGetCharAndInc(const s:PPUCURawByteChar;Len:TPUCUInt32;var CodeUnit:TPUCUInt32):TPUCUUInt32;
+var Value,CharClass,State:TPUCUUInt32;
 begin
  result:=0;
  if (CodeUnit>=0) and (CodeUnit<Len) then begin
   State:=ucACCEPT;
   while CodeUnit<Len do begin
-   Value:=byte(TPUCURawByteChar(s[CodeUnit]));
+   Value:=TPUCUUInt8(TPUCURawByteChar(s[CodeUnit]));
    inc(CodeUnit);
    CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
    if State=ucACCEPT then begin
@@ -33339,9 +33439,9 @@ begin
  end;
 end;
 
-function PUCUUTF8CodeUnitGetCharFallback(const s:TPUCURawByteString;CodeUnit:longint):longword;
-var Len:longint;
-    StartCodeUnit,Value,CharClass,State:longword;
+function PUCUUTF8CodeUnitGetCharFallback(const s:TPUCURawByteString;CodeUnit:TPUCUInt32):TPUCUUInt32;
+var Len:TPUCUInt32;
+    StartCodeUnit,Value,CharClass,State:TPUCUUInt32;
 begin
  result:=0;
  Len:=length(s);
@@ -33349,7 +33449,7 @@ begin
   StartCodeUnit:=CodeUnit;
   State:=ucACCEPT;
   while CodeUnit<=Len do begin
-   Value:=byte(TPUCURawByteChar(s[CodeUnit]));
+   Value:=TPUCUUInt8(TPUCURawByteChar(s[CodeUnit]));
    inc(CodeUnit);
    CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
    if State=ucACCEPT then begin
@@ -33363,14 +33463,14 @@ begin
    end;
   end;
   if State<>ucACCEPT then begin
-   result:=byte(TPUCURawByteChar(s[StartCodeUnit]));
+   result:=TPUCUUInt8(TPUCURawByteChar(s[StartCodeUnit]));
   end;
  end;
 end;
 
-function PUCUUTF8CodeUnitGetCharAndIncFallback(const s:TPUCURawByteString;var CodeUnit:longint):longword;
-var Len:longint;
-    StartCodeUnit,Value,CharClass,State:longword;
+function PUCUUTF8CodeUnitGetCharAndIncFallback(const s:TPUCURawByteString;var CodeUnit:TPUCUInt32):TPUCUUInt32;
+var Len:TPUCUInt32;
+    StartCodeUnit,Value,CharClass,State:TPUCUUInt32;
 begin
  result:=0;
  Len:=length(s);
@@ -33378,7 +33478,7 @@ begin
   StartCodeUnit:=CodeUnit;
   State:=ucACCEPT;
   while CodeUnit<=Len do begin
-   Value:=byte(TPUCURawByteChar(s[CodeUnit]));
+   Value:=TPUCUUInt8(TPUCURawByteChar(s[CodeUnit]));
    inc(CodeUnit);
    CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
    if State=ucACCEPT then begin
@@ -33392,21 +33492,21 @@ begin
    end;
   end;
   if State<>ucACCEPT then begin
-   result:=byte(TPUCURawByteChar(s[StartCodeUnit]));
+   result:=TPUCUUInt8(TPUCURawByteChar(s[StartCodeUnit]));
    CodeUnit:=StartCodeUnit+1;
   end;
  end;
 end;
 
-function PUCUUTF8PtrCodeUnitGetCharAndIncFallback(const s:PPUCURawByteChar;const Len:longint;var CodeUnit:longint):longword;
-var StartCodeUnit,Value,CharClass,State:longword;
+function PUCUUTF8PtrCodeUnitGetCharAndIncFallback(const s:PPUCURawByteChar;const Len:TPUCUInt32;var CodeUnit:TPUCUInt32):TPUCUUInt32;
+var StartCodeUnit,Value,CharClass,State:TPUCUUInt32;
 begin
  result:=0;
  if (CodeUnit>=0) and (CodeUnit<Len) then begin
   StartCodeUnit:=CodeUnit;
   State:=ucACCEPT;
   while CodeUnit<Len do begin
-   Value:=byte(TPUCURawByteChar(s[CodeUnit]));
+   Value:=TPUCUUInt8(TPUCURawByteChar(s[CodeUnit]));
    inc(CodeUnit);
    CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
    if State=ucACCEPT then begin
@@ -33420,18 +33520,18 @@ begin
    end;
   end;
   if State<>ucACCEPT then begin
-   result:=byte(TPUCURawByteChar(s[StartCodeUnit]));
+   result:=TPUCUUInt8(TPUCURawByteChar(s[StartCodeUnit]));
    CodeUnit:=StartCodeUnit+1;
   end;
  end;
 end;
 
-function PUCUUTF8CodePointGetChar(const s:TPUCURawByteString;CodePoint:longint;Fallback:boolean=false):longword;
+function PUCUUTF8CodePointGetChar(const s:TPUCURawByteString;CodePoint:TPUCUInt32;Fallback:boolean=false):TPUCUUInt32;
 begin
  result:=PUCUUTF8CodeUnitGetChar(s,PUCUUTF8GetCodeUnit(s,CodePoint));
 end;
 
-function PUCUUTF8GetCharLen(const s:TPUCURawByteString;i:longint):longword;
+function PUCUUTF8GetCharLen(const s:TPUCURawByteString;i:TPUCUInt32):TPUCUUInt32;
 begin
  if (i>0) and (i<=length(s)) then begin
   result:=PUCUUTF8CharSteps[s[i]];
@@ -33440,8 +33540,8 @@ begin
  end;
 end;
 
-function PUCUUTF8Pos(const FindStr,InStr:TPUCURawByteString):longint;
-var i,j,l:longint;
+function PUCUUTF8Pos(const FindStr,InStr:TPUCURawByteString):TPUCUInt32;
+var i,j,l:TPUCUInt32;
     ok:boolean;
 begin
  result:=0;
@@ -33466,8 +33566,8 @@ begin
  end;
 end;
 
-function PUCUUTF8Copy(const Str:TPUCURawByteString;Start,Len:longint):TPUCURawByteString;
-var CodeUnit:longint;
+function PUCUUTF8Copy(const Str:TPUCURawByteString;Start,Len:TPUCUInt32):TPUCURawByteString;
+var CodeUnit:TPUCUInt32;
 begin
  result:='';
  CodeUnit:=1;
@@ -33488,8 +33588,8 @@ begin
 end;
 
 function PUCUUTF8UpperCase(const Str:TPUCURawByteString):TPUCURawByteString;
-var CodeUnit,Len,ResultLen:longint;
-    StartCodeUnit,Value,CharClass,State,CharValue:longword;
+var CodeUnit,Len,ResultLen:TPUCUInt32;
+    StartCodeUnit,Value,CharClass,State,CharValue:TPUCUUInt32;
     Data:PPUCURawByteChar;
 begin
  result:='';
@@ -33504,7 +33604,7 @@ begin
    State:=ucACCEPT;
    CharValue:=0;
    while CodeUnit<=Len do begin
-    Value:=byte(TPUCURawByteChar(Str[CodeUnit]));
+    Value:=TPUCUUInt8(TPUCURawByteChar(Str[CodeUnit]));
     inc(CodeUnit);
     CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
     if State=ucACCEPT then begin
@@ -33518,25 +33618,25 @@ begin
     end;
    end;
    if State<>ucACCEPT then begin
-    CharValue:=byte(TPUCURawByteChar(Str[StartCodeUnit]));
+    CharValue:=TPUCUUInt8(TPUCURawByteChar(Str[StartCodeUnit]));
     CodeUnit:=StartCodeUnit+1;
    end;
    if CharValue<=$10ffff then begin
     Value:=CharValue shr PUCUUnicodeUpperCaseDeltaArrayBlockBits;
-    CharValue:=longword(longint(longint(CharValue)+PUCUUnicodeUpperCaseDeltaArrayBlockData[PUCUUnicodeUpperCaseDeltaArrayIndexBlockData[PUCUUnicodeUpperCaseDeltaArrayIndexIndexData[Value shr PUCUUnicodeUpperCaseDeltaArrayIndexBlockBits],Value and PUCUUnicodeUpperCaseDeltaArrayIndexBlockMask],CharValue and PUCUUnicodeUpperCaseDeltaArrayBlockMask]));
+    CharValue:=TPUCUUInt32(TPUCUInt32(TPUCUInt32(CharValue)+PUCUUnicodeUpperCaseDeltaArrayBlockData[PUCUUnicodeUpperCaseDeltaArrayIndexBlockData[PUCUUnicodeUpperCaseDeltaArrayIndexIndexData[Value shr PUCUUnicodeUpperCaseDeltaArrayIndexBlockBits],Value and PUCUUnicodeUpperCaseDeltaArrayIndexBlockMask],CharValue and PUCUUnicodeUpperCaseDeltaArrayBlockMask]));
    end;
    if CharValue<=$7f then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte(CharValue));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8(CharValue));
     inc(ResultLen);
    end else if CharValue<=$7ff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($c0 or ((CharValue shr 6) and $1f)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($c0 or ((CharValue shr 6) and $1f)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,2);
 {$ifdef PUCUStrictUTF8}
    end else if CharValue<=$d7ff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($e0 or ((CharValue shr 12) and $0f)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($e0 or ((CharValue shr 12) and $0f)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,3);
    end else if CharValue<=$dfff then begin
     Data[ResultLen]:=#$ef; // $fffd
@@ -33545,31 +33645,31 @@ begin
     inc(ResultLen,3);
 {$endif}
    end else if CharValue<=$ffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($e0 or ((CharValue shr 12) and $0f)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($e0 or ((CharValue shr 12) and $0f)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,3);
    end else if CharValue<=$1fffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($f0 or ((CharValue shr 18) and $07)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 12) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+3]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($f0 or ((CharValue shr 18) and $07)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+    Data[ResultLen+3]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,4);
 {$ifndef PUCUStrictUTF8}
    end else if CharValue<=$3ffffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($f8 or ((CharValue shr 24) and $03)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 18) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(byte($80 or ((CharValue shr 12) and $3f)));
-    Data[ResultLen+3]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+4]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($f8 or ((CharValue shr 24) and $03)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 18) and $3f)));
+    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+    Data[ResultLen+3]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+    Data[ResultLen+4]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,5);
    end else if CharValue<=$7fffffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($fc or ((CharValue shr 30) and $01)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 24) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(byte($80 or ((CharValue shr 18) and $3f)));
-    Data[ResultLen+3]:=TPUCURawByteChar(byte($80 or ((CharValue shr 12) and $3f)));
-    Data[ResultLen+4]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+5]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($fc or ((CharValue shr 30) and $01)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 24) and $3f)));
+    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 18) and $3f)));
+    Data[ResultLen+3]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+    Data[ResultLen+4]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+    Data[ResultLen+5]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,6);
 {$endif}
    end else begin
@@ -33584,8 +33684,8 @@ begin
 end;
 
 function PUCUUTF8LowerCase(const Str:TPUCURawByteString):TPUCURawByteString;
-var CodeUnit,Len,ResultLen:longint;
-    StartCodeUnit,Value,CharClass,State,CharValue:longword;
+var CodeUnit,Len,ResultLen:TPUCUInt32;
+    StartCodeUnit,Value,CharClass,State,CharValue:TPUCUUInt32;
     Data:PPUCURawByteChar;
 begin
  result:='';
@@ -33600,7 +33700,7 @@ begin
    State:=ucACCEPT;
    CharValue:=0;
    while CodeUnit<=Len do begin
-    Value:=byte(TPUCURawByteChar(Str[CodeUnit]));
+    Value:=TPUCUUInt8(TPUCURawByteChar(Str[CodeUnit]));
     inc(CodeUnit);
     CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
     if State=ucACCEPT then begin
@@ -33614,25 +33714,25 @@ begin
     end;
    end;
    if State<>ucACCEPT then begin
-    CharValue:=byte(TPUCURawByteChar(Str[StartCodeUnit]));
+    CharValue:=TPUCUUInt8(TPUCURawByteChar(Str[StartCodeUnit]));
     CodeUnit:=StartCodeUnit+1;
    end;
    if CharValue<=$10ffff then begin
     Value:=CharValue shr PUCUUnicodeLowerCaseDeltaArrayBlockBits;
-    CharValue:=longword(longint(longint(CharValue)+PUCUUnicodeLowerCaseDeltaArrayBlockData[PUCUUnicodeLowerCaseDeltaArrayIndexBlockData[PUCUUnicodeLowerCaseDeltaArrayIndexIndexData[Value shr PUCUUnicodeLowerCaseDeltaArrayIndexBlockBits],Value and PUCUUnicodeLowerCaseDeltaArrayIndexBlockMask],CharValue and PUCUUnicodeLowerCaseDeltaArrayBlockMask]));
+    CharValue:=TPUCUUInt32(TPUCUInt32(TPUCUInt32(CharValue)+PUCUUnicodeLowerCaseDeltaArrayBlockData[PUCUUnicodeLowerCaseDeltaArrayIndexBlockData[PUCUUnicodeLowerCaseDeltaArrayIndexIndexData[Value shr PUCUUnicodeLowerCaseDeltaArrayIndexBlockBits],Value and PUCUUnicodeLowerCaseDeltaArrayIndexBlockMask],CharValue and PUCUUnicodeLowerCaseDeltaArrayBlockMask]));
    end;
    if CharValue<=$7f then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte(CharValue));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8(CharValue));
     inc(ResultLen);
    end else if CharValue<=$7ff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($c0 or ((CharValue shr 6) and $1f)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($c0 or ((CharValue shr 6) and $1f)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,2);
 {$ifdef PUCUStrictUTF8}
    end else if CharValue<=$d7ff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($e0 or ((CharValue shr 12) and $0f)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($e0 or ((CharValue shr 12) and $0f)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,3);
    end else if CharValue<=$dfff then begin
     Data[ResultLen]:=#$ef; // $fffd
@@ -33641,31 +33741,31 @@ begin
     inc(ResultLen,3);
 {$endif}
    end else if CharValue<=$ffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($e0 or ((CharValue shr 12) and $0f)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($e0 or ((CharValue shr 12) and $0f)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,3);
    end else if CharValue<=$1fffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($f0 or ((CharValue shr 18) and $07)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 12) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+3]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($f0 or ((CharValue shr 18) and $07)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+    Data[ResultLen+3]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,4);
 {$ifndef PUCUStrictUTF8}
    end else if CharValue<=$3ffffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($f8 or ((CharValue shr 24) and $03)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 18) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(byte($80 or ((CharValue shr 12) and $3f)));
-    Data[ResultLen+3]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+4]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($f8 or ((CharValue shr 24) and $03)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 18) and $3f)));
+    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+    Data[ResultLen+3]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+    Data[ResultLen+4]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,5);
    end else if CharValue<=$7fffffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($fc or ((CharValue shr 30) and $01)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 24) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(byte($80 or ((CharValue shr 18) and $3f)));
-    Data[ResultLen+3]:=TPUCURawByteChar(byte($80 or ((CharValue shr 12) and $3f)));
-    Data[ResultLen+4]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+5]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($fc or ((CharValue shr 30) and $01)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 24) and $3f)));
+    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 18) and $3f)));
+    Data[ResultLen+3]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+    Data[ResultLen+4]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+    Data[ResultLen+5]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,6);
 {$endif}
    end else begin
@@ -33680,7 +33780,7 @@ begin
 end;
 
 function PUCUUTF8Trim(const Str:TPUCURawByteString):TPUCURawByteString;
-var i,j:longint;
+var i,j:TPUCUInt32;
 begin
  i:=1;
  while PUCUUnicodeIsWhiteSpace(PUCUUTF8CodeUnitGetChar(Str,i)) do begin
@@ -33692,7 +33792,7 @@ begin
   PUCUUTF8Dec(Str,j);
  end;
  if (j<=length(Str)) and (Str[j]>=#80) then begin
-  inc(j,longint(PUCUUTF8GetCharLen(Str,j))-1);
+  inc(j,TPUCUInt32(PUCUUTF8GetCharLen(Str,j))-1);
  end;
  if i<=j then begin
   result:=copy(Str,i,(j-i)+1);
@@ -33702,8 +33802,8 @@ begin
 end;
 
 function PUCUUTF8Correct(const Str:TPUCURawByteString):TPUCURawByteString;
-var CodeUnit,Len,ResultLen:longint;
-    StartCodeUnit,Value,CharClass,State,CharValue:longword;
+var CodeUnit,Len,ResultLen:TPUCUInt32;
+    StartCodeUnit,Value,CharClass,State,CharValue:TPUCUUInt32;
     Data:PPUCURawByteChar;
 begin
  if (length(Str)=0) or PUCUUTF8Validate(Str) then begin
@@ -33720,7 +33820,7 @@ begin
    State:=ucACCEPT;
    CharValue:=0;
    while CodeUnit<=Len do begin
-    Value:=byte(TPUCURawByteChar(Str[CodeUnit]));
+    Value:=TPUCUUInt8(TPUCURawByteChar(Str[CodeUnit]));
     inc(CodeUnit);
     CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
     if State=ucACCEPT then begin
@@ -33734,21 +33834,21 @@ begin
     end;
    end;
    if State<>ucACCEPT then begin
-    CharValue:=byte(TPUCURawByteChar(Str[StartCodeUnit]));
+    CharValue:=TPUCUUInt8(TPUCURawByteChar(Str[StartCodeUnit]));
     CodeUnit:=StartCodeUnit+1;
    end;
    if CharValue<=$7f then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte(CharValue));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8(CharValue));
     inc(ResultLen);
    end else if CharValue<=$7ff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($c0 or ((CharValue shr 6) and $1f)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($c0 or ((CharValue shr 6) and $1f)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,2);
 {$ifdef PUCUStrictUTF8}
    end else if CharValue<=$d7ff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($e0 or ((CharValue shr 12) and $0f)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($e0 or ((CharValue shr 12) and $0f)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,3);
    end else if CharValue<=$dfff then begin
     Data[ResultLen]:=#$ef; // $fffd
@@ -33757,31 +33857,31 @@ begin
     inc(ResultLen,3);
 {$endif}
    end else if CharValue<=$ffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($e0 or ((CharValue shr 12) and $0f)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($e0 or ((CharValue shr 12) and $0f)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,3);
    end else if CharValue<=$1fffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($f0 or ((CharValue shr 18) and $07)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 12) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+3]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($f0 or ((CharValue shr 18) and $07)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+    Data[ResultLen+3]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,4);
 {$ifndef PUCUStrictUTF8}
    end else if CharValue<=$3ffffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($f8 or ((CharValue shr 24) and $03)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 18) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(byte($80 or ((CharValue shr 12) and $3f)));
-    Data[ResultLen+3]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+4]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
-    inc(ResultLen,5);            
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($f8 or ((CharValue shr 24) and $03)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 18) and $3f)));
+    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+    Data[ResultLen+3]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+    Data[ResultLen+4]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+    inc(ResultLen,5);
    end else if CharValue<=$7fffffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(byte($fc or ((CharValue shr 30) and $01)));
-    Data[ResultLen+1]:=TPUCURawByteChar(byte($80 or ((CharValue shr 24) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(byte($80 or ((CharValue shr 18) and $3f)));
-    Data[ResultLen+3]:=TPUCURawByteChar(byte($80 or ((CharValue shr 12) and $3f)));
-    Data[ResultLen+4]:=TPUCURawByteChar(byte($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+5]:=TPUCURawByteChar(byte($80 or (CharValue and $3f)));
+    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($fc or ((CharValue shr 30) and $01)));
+    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 24) and $3f)));
+    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 18) and $3f)));
+    Data[ResultLen+3]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+    Data[ResultLen+4]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+    Data[ResultLen+5]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
     inc(ResultLen,6);
 {$endif}
    end else begin
@@ -33796,22 +33896,22 @@ begin
 end;
 
 function PUCUUTF8FromLatin1(const Str:TPUCURawByteString):TPUCURawByteString;
-var CodeUnit:longint;
+var CodeUnit:TPUCUInt32;
 begin
  if PUCUUTF8Validate(Str) then begin
   result:=Str;
  end else begin
   result:='';
   for CodeUnit:=1 to length(Str) do begin
-   result:=result+PUCUUTF32CharToUTF8(byte(TPUCURawByteChar(Str[CodeUnit])));
+   result:=result+PUCUUTF32CharToUTF8(TPUCUUInt8(TPUCURawByteChar(Str[CodeUnit])));
   end;
  end;
 end;
 
-function PUCUUTF8LevenshteinDistance(const s,t:TPUCURawByteString):longint;
-var d:array of array of longint;
-    n,m,i,j,ci,cj,oi,oj,Deletion,Insertion,Substitution:longint;
-    si,tj:longword;
+function PUCUUTF8LevenshteinDistance(const s,t:TPUCURawByteString):TPUCUInt32;
+var d:array of array of TPUCUInt32;
+    n,m,i,j,ci,cj,oi,oj,Deletion,Insertion,Substitution:TPUCUInt32;
+    si,tj:TPUCUUInt32;
 begin
  n:=PUCUUTF8LengthEx(s);
  m:=PUCUUTF8LengthEx(t);
@@ -33889,10 +33989,10 @@ begin
  end;
 end;
 
-function PUCUUTF8DamerauLevenshteinDistance(const s,t:TPUCURawByteString):longint;
-var d:array of array of longint;
-    n,m,i,j,ci,cj,oi,oj,Cost,Deletion,Insertion,Substitution,Transposition,Value:longint;
-    si,tj,lsi,ltj:longword;
+function PUCUUTF8DamerauLevenshteinDistance(const s,t:TPUCURawByteString):TPUCUInt32;
+var d:array of array of TPUCUInt32;
+    n,m,i,j,ci,cj,oi,oj,Cost,Deletion,Insertion,Substitution,Transposition,Value:TPUCUInt32;
+    si,tj,lsi,ltj:TPUCUUInt32;
 begin
  n:=PUCUUTF8LengthEx(s);
  m:=PUCUUTF8LengthEx(t);
@@ -33982,12 +34082,547 @@ begin
  end;
 end;
 
-function PUCUStringLength(const s:TPUCURawByteString):longint;
+function PUCUStringLength(const s:TPUCURawByteString):TPUCUInt32;
 begin
  if PUCUIsUTF8(s) then begin
   result:=PUCUUTF8Length(s);
  end else begin
   result:=length(s);
+ end;
+end;
+
+function PUCUUTF32CharToUTF8(CharValue:TPUCUUTF32Char):TPUCURawByteString;
+var Data:array[0..{$ifdef PUCUStrictUTF8}3{$else}5{$endif}] of TPUCURawByteChar;
+    ResultLen:TPUCUInt32;
+begin
+ if CharValue=0 then begin
+  result:=#0;
+ end else begin
+  if CharValue<=$7f then begin
+   Data[0]:=TPUCURawByteChar(TPUCUUInt8(CharValue));
+   ResultLen:=1;
+  end else if CharValue<=$7ff then begin
+   Data[0]:=TPUCURawByteChar(TPUCUUInt8($c0 or ((CharValue shr 6) and $1f)));
+   Data[1]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+   ResultLen:=2;
+{$ifdef PUCUStrictUTF8}
+  end else if CharValue<=$d7ff then begin
+   Data[0]:=TPUCURawByteChar(TPUCUUInt8($e0 or ((CharValue shr 12) and $0f)));
+   Data[1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+   Data[2]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+   ResultLen:=3;
+  end else if CharValue<=$dfff then begin
+   Data[0]:=#$ef; // $fffd
+   Data[1]:=#$bf;
+   Data[2]:=#$bd;
+   ResultLen:=3;
+{$endif}
+  end else if CharValue<=$ffff then begin
+   Data[0]:=TPUCURawByteChar(TPUCUUInt8($e0 or ((CharValue shr 12) and $0f)));
+   Data[1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+   Data[2]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+   ResultLen:=3;
+  end else if CharValue<=$1fffff then begin
+   Data[0]:=TPUCURawByteChar(TPUCUUInt8($f0 or ((CharValue shr 18) and $07)));
+   Data[1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+   Data[2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+   Data[3]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+   ResultLen:=4;
+{$ifndef PUCUStrictUTF8}
+  end else if CharValue<=$3ffffff then begin
+   Data[0]:=TPUCURawByteChar(TPUCUUInt8($f8 or ((CharValue shr 24) and $03)));
+   Data[1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 18) and $3f)));
+   Data[2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+   Data[3]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+   Data[4]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+   ResultLen:=5;
+  end else if CharValue<=$7fffffff then begin
+   Data[0]:=TPUCURawByteChar(TPUCUUInt8($fc or ((CharValue shr 30) and $01)));
+   Data[1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 24) and $3f)));
+   Data[2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 18) and $3f)));
+   Data[3]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+   Data[4]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+   Data[5]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+   ResultLen:=6;
+{$endif}
+  end else begin
+   Data[0]:=#$ef; // $fffd
+   Data[1]:=#$bf;
+   Data[2]:=#$bd;
+   ResultLen:=3;
+  end;
+  SetString(result,PPUCURawByteChar(@Data[0]),ResultLen);
+ end;
+end;
+
+function PUCUUTF32CharToUTF8Len(CharValue:TPUCUUTF32Char):TPUCUInt32;
+begin
+ if CharValue<=$7f then begin
+  result:=1;
+ end else if CharValue<=$7ff then begin
+  result:=2;
+ end else if CharValue<=$ffff then begin
+  result:=3;
+ end else if CharValue<=$1fffff then begin
+  result:=4;
+{$ifndef PUCUStrictUTF8}
+ end else if CharValue<=$3ffffff then begin
+  result:=5;
+ end else if CharValue<=$7fffffff then begin
+  result:=6;
+{$endif}
+ end else begin
+  result:=3;
+ end;
+end;
+
+function PUCUUTF32ToUTF8(const s:TPUCUUTF32String):TPUCUUTF8String;
+var i,j:TPUCUInt32;
+    u4c:TPUCUUTF32CHAR;
+begin
+ result:='';
+ j:=0;
+ for i:=0 to length(s)-1 do begin
+  u4c:=s[i];
+  if u4c<=$7f then begin
+   inc(j);
+  end else if u4c<=$7ff then begin
+   inc(j,2);
+  end else if u4c<=$ffff then begin
+   inc(j,3);
+  end else if u4c<=$1fffff then begin
+   inc(j,4);
+{$ifndef strictutf8}
+  end else if u4c<=$3ffffff then begin
+   inc(j,5);
+  end else if u4c<=$7fffffff then begin
+   inc(j,6);
+{$endif}
+  end else begin
+   inc(j,3);
+  end;
+ end;
+ SetLength(result,j);
+ j:=1;
+ for i:=0 to length(s)-1 do begin
+  u4c:=s[i];
+  if u4c<=$7f then begin
+   result[j]:=AnsiChar(TPUCUUInt8(u4c));
+   inc(j);
+  end else if u4c<=$7ff then begin
+   result[j]:=AnsiChar(TPUCUUInt8($c0 or ((u4c shr 6) and $1f)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+   inc(j,2);
+  end else if u4c<=$ffff then begin
+   result[j]:=AnsiChar(TPUCUUInt8($e0 or ((u4c shr 12) and $0f)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
+   result[j+2]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+   inc(j,3);
+  end else if u4c<=$1fffff then begin
+   result[j]:=AnsiChar(TPUCUUInt8($f0 or ((u4c shr 18) and $07)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 12) and $3f)));
+   result[j+2]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
+   result[j+3]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+   inc(j,4);
+{$ifndef strictutf8}
+  end else if u4c<=$3ffffff then begin
+   result[j]:=AnsiChar(TPUCUUInt8($f8 or ((u4c shr 24) and $03)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 18) and $3f)));
+   result[j+2]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 12) and $3f)));
+   result[j+3]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
+   result[j+4]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+   inc(j,5);
+  end else if u4c<=$7fffffff then begin
+   result[j]:=AnsiChar(TPUCUUInt8($fc or ((u4c shr 30) and $01)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 24) and $3f)));
+   result[j+2]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 18) and $3f)));
+   result[j+3]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 12) and $3f)));
+   result[j+4]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
+   result[j+5]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+   inc(j,6);
+{$endif}
+  end else begin
+   u4c:=$fffd;
+   result[j]:=AnsiChar(TPUCUUInt8($e0 or ((u4c shr 12) and $0f)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
+   result[j+2]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+   inc(j,3);
+  end;
+ end;
+end;
+
+function PUCUUTF8ToUTF32(const s:TPUCUUTF8String):TPUCUUTF32String;
+var i,j:TPUCUInt32;
+    b:TPUCUUInt8;
+begin
+ j:=0;
+ i:=1;
+ while i<=length(s) do begin
+  b:=TPUCUUInt8(s[i]);
+  if (b and $80)=0 then begin
+   inc(i);
+   inc(j);
+  end else if ((i+1)<=length(s)) and ((b and $e0)=$c0) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) then begin
+   inc(i,2);
+   inc(j);
+  end else if ((i+2)<=length(s)) and ((b and $f0)=$e0) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) then begin
+   inc(i,3);
+   inc(j);
+  end else if ((i+3)<=length(s)) and ((b and $f8)=$f0) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) and ((TPUCUUInt8(s[i+3]) and $c0)=$80) then begin
+   inc(i,4);
+   inc(j);
+{$ifndef strictutf8}
+  end else if ((i+4)<=length(s)) and ((b and $fc)=$f8) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) and ((TPUCUUInt8(s[i+3]) and $c0)=$80) and ((TPUCUUInt8(s[i+4]) and $c0)=$80) then begin
+   inc(i,5);
+   inc(j);
+  end else if ((i+5)<=length(s)) and ((b and $fe)=$fc) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) and ((TPUCUUInt8(s[i+3]) and $c0)=$80) and ((TPUCUUInt8(s[i+4]) and $c0)=$80) and ((TPUCUUInt8(s[i+5]) and $c0)=$80) then begin
+   inc(i,6);
+   inc(j);
+{$endif}   
+  end else begin
+   inc(i);
+   inc(j);
+  end;
+ end;
+ SetLength(result,j);
+ if j=0 then begin
+  exit;
+ end;
+ j:=0;
+ i:=1;
+ while i<=length(s) do begin
+  b:=TPUCUUInt8(s[i]);
+  if (b and $80)=0 then begin
+   result[j]:=b;
+   inc(i);
+   inc(j);
+  end else if ((i+1)<=length(s)) and ((b and $e0)=$c0) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) then begin
+   result[j]:=((TPUCUUInt8(s[i]) and $1f) shl 6) or (TPUCUUInt8(s[i+1]) and $3f);
+   inc(i,2);
+   inc(j);
+  end else if ((i+2)<=length(s)) and ((b and $f0)=$e0) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) then begin
+   result[j]:=((TPUCUUInt8(s[i]) and $0f) shl 12) or ((TPUCUUInt8(s[i+1]) and $3f) shl 6) or (TPUCUUInt8(s[i+2]) and $3f);
+   inc(i,3);
+   inc(j);
+  end else if ((i+3)<=length(s)) and ((b and $f8)=$f0) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) and ((TPUCUUInt8(s[i+3]) and $c0)=$80) then begin
+   result[j]:=((TPUCUUInt8(s[i]) and $07) shl 18) or ((TPUCUUInt8(s[i+1]) and $3f) shl 12) or ((TPUCUUInt8(s[i+2]) and $3f) shl 6) or (TPUCUUInt8(s[i+3]) and $3f);
+   inc(i,4);
+   inc(j);
+{$ifndef strictutf8}
+  end else if ((i+4)<=length(s)) and ((b and $fc)=$f8) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) and ((TPUCUUInt8(s[i+3]) and $c0)=$80) and ((TPUCUUInt8(s[i+4]) and $c0)=$80) then begin
+   result[j]:=((TPUCUUInt8(s[i]) and $03) shl 24) or ((TPUCUUInt8(s[i+1]) and $3f) shl 18) or ((TPUCUUInt8(s[i+2]) and $3f) shl 12) or ((TPUCUUInt8(s[i+3]) and $3f) shl 6) or (TPUCUUInt8(s[i+4]) and $3f);
+   inc(i,5);
+   inc(j);
+  end else if ((i+5)<=length(s)) and ((b and $fe)=$fc) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) and ((TPUCUUInt8(s[i+3]) and $c0)=$80) and ((TPUCUUInt8(s[i+4]) and $c0)=$80) and ((TPUCUUInt8(s[i+5]) and $c0)=$80) then begin
+   result[j]:=((TPUCUUInt8(s[i]) and $01) shl 30) or ((TPUCUUInt8(s[i+1]) and $3f) shl 24) or ((TPUCUUInt8(s[i+2]) and $3f) shl 18) or ((TPUCUUInt8(s[i+3]) and $3f) shl 12) or ((TPUCUUInt8(s[i+4]) and $3f) shl 6) or (TPUCUUInt8(s[i+5]) and $3f);
+   inc(i,6);
+   inc(j);
+{$endif}
+  end else begin
+   result[j]:=$fffd;
+   inc(i);
+   inc(j);
+  end;
+ end;
+end;
+
+function PUCUUTF8ToUTF16(const s:TPUCUUTF8String):TPUCUUTF16STRING;
+var i,j:TPUCUInt32;
+    w:TPUCUUInt32;
+    b:TPUCUUInt8;
+begin
+ result:='';
+ i:=1;
+ j:=0;
+ while i<=length(s) do begin
+  b:=TPUCUUInt8(s[i]);
+  if (b and $80)=0 then begin
+   w:=b;
+   inc(i);
+  end else if ((i+1)<=length(s)) and ((b and $e0)=$c0) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) then begin
+   w:=((TPUCUUInt8(s[i]) and $1f) shl 6) or (TPUCUUInt8(s[i+1]) and $3f);
+   inc(i,2);
+  end else if ((i+2)<=length(s)) and ((b and $f0)=$e0) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) then begin
+   w:=((TPUCUUInt8(s[i]) and $0f) shl 12) or ((TPUCUUInt8(s[i+1]) and $3f) shl 6) or (TPUCUUInt8(s[i+2]) and $3f);
+   inc(i,3);
+  end else if ((i+3)<=length(s)) and ((b and $f8)=$f0) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) and ((TPUCUUInt8(s[i+3]) and $c0)=$80) then begin
+   w:=((TPUCUUInt8(s[i]) and $07) shl 18) or ((TPUCUUInt8(s[i+1]) and $3f) shl 12) or ((TPUCUUInt8(s[i+2]) and $3f) shl 6) or (TPUCUUInt8(s[i+3]) and $3f);
+   inc(i,4);
+{$ifndef PUCUStrictUTF8}
+  end else if ((i+4)<=length(s)) and ((b and $fc)=$f8) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) and ((TPUCUUInt8(s[i+3]) and $c0)=$80) and ((TPUCUUInt8(s[i+4]) and $c0)=$80) then begin
+   w:=((TPUCUUInt8(s[i]) and $03) shl 24) or ((TPUCUUInt8(s[i+1]) and $3f) shl 18) or ((TPUCUUInt8(s[i+2]) and $3f) shl 12) or ((TPUCUUInt8(s[i+3]) and $3f) shl 6) or (TPUCUUInt8(s[i+4]) and $3f);
+   inc(i,5);
+  end else if ((i+5)<=length(s)) and ((b and $fe)=$fc) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) and ((TPUCUUInt8(s[i+3]) and $c0)=$80) and ((TPUCUUInt8(s[i+4]) and $c0)=$80) and ((TPUCUUInt8(s[i+5]) and $c0)=$80) then begin
+   w:=((TPUCUUInt8(s[i]) and $01) shl 30) or ((TPUCUUInt8(s[i+1]) and $3f) shl 24) or ((TPUCUUInt8(s[i+2]) and $3f) shl 18) or ((TPUCUUInt8(s[i+3]) and $3f) shl 12) or ((TPUCUUInt8(s[i+4]) and $3f) shl 6) or (TPUCUUInt8(s[i+5]) and $3f);
+   inc(i,6);
+{$endif}
+  end else begin
+   w:=$fffd;
+   inc(i);
+  end;
+  if w<=$d7ff then begin
+   inc(j);
+  end else if w<=$dfff then begin
+   inc(j);
+  end else if w<=$fffd then begin
+   inc(j);
+  end else if w<=$ffff then begin
+   inc(j);
+  end else if w<=$10ffff then begin
+   inc(j,2);
+  end else begin
+   inc(j);
+  end;
+ end;
+ SetLength(result,j);
+ i:=1;
+ j:=0;
+ while i<=length(s) do begin
+  b:=TPUCUUInt8(s[i]);
+  if (b and $80)=0 then begin
+   w:=b;
+   inc(i);
+  end else if ((i+1)<=length(s)) and ((b and $e0)=$c0) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) then begin
+   w:=((TPUCUUInt8(s[i]) and $1f) shl 6) or (TPUCUUInt8(s[i+1]) and $3f);
+   inc(i,2);
+  end else if ((i+2)<=length(s)) and ((b and $f0)=$e0) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) then begin
+   w:=((TPUCUUInt8(s[i]) and $0f) shl 12) or ((TPUCUUInt8(s[i+1]) and $3f) shl 6) or (TPUCUUInt8(s[i+2]) and $3f);
+   inc(i,3);
+  end else if ((i+3)<=length(s)) and ((b and $f8)=$f0) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) and ((TPUCUUInt8(s[i+3]) and $c0)=$80) then begin
+   w:=((TPUCUUInt8(s[i]) and $07) shl 18) or ((TPUCUUInt8(s[i+1]) and $3f) shl 12) or ((TPUCUUInt8(s[i+2]) and $3f) shl 6) or (TPUCUUInt8(s[i+3]) and $3f);
+   inc(i,4);
+{$ifndef PUCUStrictUTF8}
+  end else if ((i+4)<=length(s)) and ((b and $fc)=$f8) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) and ((TPUCUUInt8(s[i+3]) and $c0)=$80) and ((TPUCUUInt8(s[i+4]) and $c0)=$80) then begin
+   w:=((TPUCUUInt8(s[i]) and $03) shl 24) or ((TPUCUUInt8(s[i+1]) and $3f) shl 18) or ((TPUCUUInt8(s[i+2]) and $3f) shl 12) or ((TPUCUUInt8(s[i+3]) and $3f) shl 6) or (TPUCUUInt8(s[i+4]) and $3f);
+   inc(i,5);
+  end else if ((i+5)<=length(s)) and ((b and $fe)=$fc) and ((TPUCUUInt8(s[i+1]) and $c0)=$80) and ((TPUCUUInt8(s[i+2]) and $c0)=$80) and ((TPUCUUInt8(s[i+3]) and $c0)=$80) and ((TPUCUUInt8(s[i+4]) and $c0)=$80) and ((TPUCUUInt8(s[i+5]) and $c0)=$80) then begin
+   w:=((TPUCUUInt8(s[i]) and $01) shl 30) or ((TPUCUUInt8(s[i+1]) and $3f) shl 24) or ((TPUCUUInt8(s[i+2]) and $3f) shl 18) or ((TPUCUUInt8(s[i+3]) and $3f) shl 12) or ((TPUCUUInt8(s[i+4]) and $3f) shl 6) or (TPUCUUInt8(s[i+5]) and $3f);
+   inc(i,6);
+{$endif}
+  end else begin
+   w:=$fffd;
+   inc(i);
+  end;
+  if w<=$d7ff then begin
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16(w));
+  end else if w<=$dfff then begin
+   inc(j);
+   result[j]:=#$fffd;
+  end else if w<=$fffd then begin
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16(w));
+  end else if w<=$ffff then begin
+   inc(j);
+   result[j]:=#$fffd;
+  end else if w<=$10ffff then begin
+   dec(w,$10000);
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16((w shr 10) or $d800));
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16((w and $3ff) or $dc00));
+  end else begin
+   inc(j);
+   result[j]:=#$fffd;
+  end;
+ end;
+end;
+
+function PUCUUTF16ToUTF8(const s:TPUCUUTF16STRING):TPUCUUTF8String;
+var i,j:TPUCUInt32;
+    w:TPUCUUInt16;
+    u4c:TPUCUUTF32Char;
+begin
+ result:='';
+ j:=0;
+ i:=1;
+ while i<=length(s) do begin
+  w:=TPUCUUInt16(s[i]);
+  if (w<=$d7ff) or (w>=$e000) then begin
+   u4c:=w;
+   inc(i);
+  end else if ((i+1)<=length(s)) and ((w>=$d800) and (w<=$dbff)) and ((TPUCUUInt16(s[i+1])>=$dc00) and (TPUCUUInt16(s[i+1])<=$dfff)) then begin
+   u4c:=(TPUCUUTF32CHAR(TPUCUUTF32CHAR(w and $3ff) shl 10) or TPUCUUTF32CHAR(TPUCUUInt16(s[i+1]) and $3ff))+$10000;
+   inc(i,2);
+  end else begin
+   u4c:=$fffd;
+   inc(i);
+  end;
+  if u4c<=$7f then begin
+   inc(j);
+  end else if u4c<=$7ff then begin
+   inc(j,2);
+  end else if u4c<=$ffff then begin
+   inc(j,3);
+  end else if u4c<=$1fffff then begin
+   inc(j,4);
+{$ifndef PUCUStrictUTF8}
+  end else if u4c<=$3ffffff then begin
+   inc(j,5);
+  end else if u4c<=$7fffffff then begin
+   inc(j,6);
+{$endif}
+  end else begin
+   inc(j,3);
+  end;
+ end;
+ SetLength(result,j);
+ j:=1;
+ i:=1;
+ while i<=length(s) do begin
+  w:=TPUCUUInt16(s[i]);
+  if (w<=$d7ff) or (w>=$e000) then begin
+   u4c:=w;
+   inc(i);
+  end else if ((i+1)<=length(s)) and ((w>=$d800) and (w<=$dbff)) and ((TPUCUUInt16(s[i+1])>=$dc00) and (TPUCUUInt16(s[i+1])<=$dfff)) then begin
+   u4c:=(TPUCUUTF32CHAR(TPUCUUTF32CHAR(w and $3ff) shl 10) or TPUCUUTF32CHAR(TPUCUUInt16(s[i+1]) and $3ff))+$10000;
+   inc(i,2);
+  end else begin
+   u4c:=$fffd;
+   inc(i);
+  end;
+  if u4c<=$7f then begin
+   result[j]:=AnsiChar(TPUCUUInt8(u4c));
+   inc(j);
+  end else if u4c<=$7ff then begin
+   result[j]:=AnsiChar(TPUCUUInt8($c0 or ((u4c shr 6) and $1f)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+   inc(j,2);
+  end else if u4c<=$ffff then begin
+   result[j]:=AnsiChar(TPUCUUInt8($e0 or ((u4c shr 12) and $0f)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
+   result[j+2]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+   inc(j,3);
+  end else if u4c<=$1fffff then begin
+   result[j]:=AnsiChar(TPUCUUInt8($f0 or ((u4c shr 18) and $07)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 12) and $3f)));
+   result[j+2]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
+   result[j+3]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+   inc(j,4);
+{$ifndef PUCUStrictUTF8}
+  end else if u4c<=$3ffffff then begin
+   result[j]:=AnsiChar(TPUCUUInt8($f8 or ((u4c shr 24) and $03)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 18) and $3f)));
+   result[j+2]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 12) and $3f)));
+   result[j+3]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
+   result[j+4]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+   inc(j,5);
+  end else if u4c<=$7fffffff then begin
+   result[j]:=AnsiChar(TPUCUUInt8($fc or ((u4c shr 30) and $01)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 24) and $3f)));
+   result[j+2]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 18) and $3f)));
+   result[j+3]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 12) and $3f)));
+   result[j+4]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
+   result[j+5]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+   inc(j,6);
+{$endif}
+  end else begin
+   u4c:=$fffd;
+   result[j]:=AnsiChar(TPUCUUInt8($e0 or (u4c shr 12)));
+   result[j+1]:=AnsiChar(TPUCUUInt8($80 or ((u4c shr 6) and $3f)));
+   result[j+2]:=AnsiChar(TPUCUUInt8($80 or (u4c and $3f)));
+   inc(j,3);
+  end;
+ end;
+end;
+
+function PUCUUTF16ToUTF32(const Value:TPUCUUTF16String):TPUCUUTF32String;
+var i,j:TPUCUInt32;
+    v:TPUCUUInt32;
+    w:TPUCUUInt16;
+begin
+ i:=1;
+ j:=0;
+ result:=nil;
+ try
+  SetLength(result,length(Value));
+  while i<=length(Value) do begin
+   w:=TPUCUUInt16(Value[i]);
+   if (w<=$d7ff) or (w>=$e000) then begin
+    result[j]:=w;
+    inc(j);
+    inc(i);
+   end else if ((i+1)<=length(Value)) and ((w>=$d800) and (w<=$dbff)) and ((TPUCUUInt16(Value[i+1])>=$dc00) and (TPUCUUInt16(Value[i+1])<=$dfff)) then begin
+    result[j]:=(TPUCUUTF32Char(TPUCUUTF32Char(w and $3ff) shl 10) or TPUCUUTF32Char(TPUCUUInt16(Value[i+1]) and $3ff))+$10000;
+    inc(j);
+    inc(i,2);
+   end else begin
+    result[j]:=w; // $fffd;
+    inc(j);
+    inc(i);
+   end;
+  end;
+ finally
+  SetLength(result,j);
+ end;
+end;
+
+function PUCUUTF32ToUTF16(const Value:TPUCUUTF32String):TPUCUUTF16String;
+var i,j:TPUCUInt32;
+    w:TPUCUUInt32;
+begin
+ result:='';
+ j:=0;
+ for i:=0 to length(Value)-1 do begin
+  w:=Value[i];
+  if w<=$d7ff then begin
+   inc(j);
+  end else if w<=$dfff then begin
+   inc(j);
+  end else if w<=$fffd then begin
+   inc(j);
+  end else if w<=$ffff then begin
+   inc(j);
+  end else if w<=$10ffff then begin
+   inc(j,2);
+  end else begin
+   inc(j);
+  end;
+ end;
+ SetLength(result,j);
+ j:=0;
+ for i:=0 to length(Value)-1 do begin
+  w:=Value[i];
+  if w<=$d7ff then begin
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16(w));
+  end else if w<=$dfff then begin
+   inc(j);
+   result[j]:=#$fffd;
+  end else if w<=$fffd then begin
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16(w));
+  end else if w<=$ffff then begin
+   inc(j);
+   result[j]:=#$fffd;
+  end else if w<=$10ffff then begin
+   dec(w,$10000);
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16((w shr 10) or $d800));
+   inc(j);
+   result[j]:=TPUCUUTF16Char(TPUCUUInt16((w and $3ff) or $dc00));
+  end else begin
+   inc(j);
+   result[j]:=#$fffd;
+  end;
+ end;
+end;
+
+function PUCUUTF32CharToUTF16(const Value:TPUCUUTF32Char):TPUCUUTF16String;
+begin
+ if Value<=$d7ff then begin
+  result:=TPUCUUTF16Char(TPUCUUInt16(Value));
+ end else if Value<=$dfff then begin
+  result:=#$fffd;
+ end else if Value<=$fffd then begin
+  result:=TPUCUUTF16Char(TPUCUUInt16(Value));
+ end else if Value<=$ffff then begin
+  result:=#$fffd;
+ end else if Value<=$10ffff then begin
+  result:=TPUCUUTF16Char(TPUCUUInt16(((Value-$10000) shr 10) or $d800));
+  result:=result+TPUCUUTF16Char(TPUCUUInt16(((Value-$10000) and $3ff) or $dc00));
+ end else begin
+  result:=#$fffd;
  end;
 end;
 
