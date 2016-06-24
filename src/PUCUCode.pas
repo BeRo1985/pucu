@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2016-06-24-23-18-0000                       *
+ *                        Version 2016-06-25-00-00-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -457,6 +457,18 @@ function PUCUUTF32ToUTF16(const Value:TPUCUUTF32String):TPUCUUTF16String;
 
 function PUCUUTF32CharToUTF16(const Value:TPUCUUTF32Char):TPUCUUTF16String;
 function PUCUUTF32CharToUTF16Len(const Value:TPUCUUTF32Char):TPUCUInt32;
+
+function PUCURawDataToUTF8String(const pData;const pDataLength:TPUCUInt32):TPUCUUTF8String;
+function PUCURawDataToUTF16String(const pData;const pDataLength:TPUCUInt32):TPUCUUTF16String;
+function PUCURawDataToUTF32String(const pData;const pDataLength:TPUCUInt32):TPUCUUTF32String;
+
+function PUCURawByteStringToUTF8String(const pString:TPUCURawByteString):TPUCUUTF8String;
+function PUCURawByteStringToUTF16String(const pString:TPUCURawByteString):TPUCUUTF16String;
+function PUCURawByteStringToUTF32String(const pString:TPUCURawByteString):TPUCUUTF32String;
+
+function PUCURawStreamToUTF8String(const pStream:TStream):TPUCUUTF8String;
+function PUCURawStreamToUTF16String(const pStream:TStream):TPUCUUTF16String;
+function PUCURawStreamToUTF32String(const pStream:TStream):TPUCUUTF32String;
 
 implementation
 
@@ -2333,6 +2345,496 @@ begin
   result:=2;
  end else begin
   result:=1;
+ end;
+end;
+
+const UTF16LittleEndianBigEndianShifts:array[0..1,0..1] of TPUCUInt32=((0,8),(8,0));
+      UTF32LittleEndianBigEndianShifts:array[0..1,0..3] of TPUCUInt32=((0,8,16,24),(24,16,8,0));
+
+function PUCURawDataToUTF8String(const pData;const pDataLength:TPUCUInt32):TPUCUUTF8String;
+type PBytes=^TBytes;
+     TBytes=array[0..65535] of TPUCUUInt8;
+var Bytes:PBytes;
+    BytesPerCodeUnit,BytesPerCodeUnitMask,LittleEndianBigEndian,
+    PassIndex,CodeUnit,CodePoint,Temp,InputLen,OutputLen:TPUCUInt32;
+begin
+ result:='';
+ Bytes:=@pData;
+ if (pDataLength>=3) and (Bytes^[0]=$ef) and (Bytes^[1]=$bb) and (Bytes^[2]=$bf) then begin
+  // UTF8
+  BytesPerCodeUnit:=1;
+  BytesPerCodeUnitMask:=0;
+  LittleEndianBigEndian:=0;
+  Bytes:=@PBytes(@pData)^[0];
+  InputLen:=pDataLength-3;
+ end else if (pDataLength>=4) and
+             (((Bytes^[0]=$00) and (Bytes^[1]=$00) and (Bytes^[2]=$fe) and (Bytes^[3]=$ff)) or
+              ((Bytes^[0]=$ff) and (Bytes^[1]=$fe) and (Bytes^[2]=$00) and (Bytes^[3]=$00))) then begin
+  // UTF32
+  BytesPerCodeUnit:=4;
+  BytesPerCodeUnitMask:=3;
+  if Bytes^[0]=$00 then begin
+   // Big endian
+   LittleEndianBigEndian:=1;
+  end else begin
+   // Little endian
+   LittleEndianBigEndian:=0;
+  end;
+  Bytes:=@PBytes(@pData)^[4];
+  InputLen:=pDataLength-4;
+ end else if (pDataLength>=2) and
+             (((Bytes^[0]=$fe) and (Bytes^[1]=$ff)) or
+              ((Bytes^[0]=$ff) and (Bytes^[1]=$fe))) then begin
+  // UTF16
+  BytesPerCodeUnit:=2;
+  BytesPerCodeUnitMask:=1;
+  if Bytes^[0]=$fe then begin
+   // Big endian
+   LittleEndianBigEndian:=1;
+  end else begin
+   // Little endian
+   LittleEndianBigEndian:=0;
+  end;
+  Bytes:=@PBytes(@pData)^[2];
+  InputLen:=pDataLength-2;
+ end else begin
+  // Latin1
+  BytesPerCodeUnit:=0;
+  BytesPerCodeUnitMask:=0;
+  LittleEndianBigEndian:=0;
+  Bytes:=@PBytes(@pData)^[0];
+  InputLen:=pDataLength;
+ end;
+ for PassIndex:=0 to 1 do begin
+  CodeUnit:=0;
+  InputLen:=pDataLength-3;
+  OutputLen:=0;
+  while (CodeUnit+BytesPerCodeUnitMask)<InputLen do begin
+   case BytesPerCodeUnit of
+    1:begin
+     // UTF8
+     CodePoint:=PUCUUTF8PtrCodeUnitGetCharAndIncFallback(pointer(Bytes),InputLen,CodeUnit);
+    end;
+    2:begin
+     // UTF16
+     CodePoint:=(TPUCUInt32(Bytes^[CodeUnit+0]) shl UTF16LittleEndianBigEndianShifts[LittleEndianBigEndian,0]) or
+                (TPUCUInt32(Bytes^[CodeUnit+1]) shl UTF16LittleEndianBigEndianShifts[LittleEndianBigEndian,1]);
+     inc(CodeUnit,2);
+     if ((CodeUnit+1)<InputLen) and ((CodePoint and $fc00)=$d800) then begin
+      Temp:=(TPUCUInt32(Bytes^[CodeUnit+0]) shl UTF16LittleEndianBigEndianShifts[LittleEndianBigEndian,0]) or
+            (TPUCUInt32(Bytes^[CodeUnit+1]) shl UTF16LittleEndianBigEndianShifts[LittleEndianBigEndian,1]);
+      if (Temp and $fc00)=$dc00 then begin
+       CodePoint:=(TPUCUUTF32Char(TPUCUUTF32Char(CodePoint and $3ff) shl 10) or TPUCUUTF32Char(Temp and $3ff))+$10000;
+       inc(CodeUnit,2);
+      end;
+     end;
+    end;
+    4:begin
+     // UTF32
+     CodePoint:=(TPUCUInt32(Bytes^[CodeUnit+0]) shl UTF32LittleEndianBigEndianShifts[LittleEndianBigEndian,0]) or
+                (TPUCUInt32(Bytes^[CodeUnit+1]) shl UTF32LittleEndianBigEndianShifts[LittleEndianBigEndian,1]) or
+                (TPUCUInt32(Bytes^[CodeUnit+2]) shl UTF32LittleEndianBigEndianShifts[LittleEndianBigEndian,2]) or
+                (TPUCUInt32(Bytes^[CodeUnit+3]) shl UTF32LittleEndianBigEndianShifts[LittleEndianBigEndian,3]);
+     inc(CodeUnit,4);
+    end;
+    else begin
+     // Latin1
+     CodePoint:=Bytes^[CodeUnit];
+     inc(CodeUnit);
+    end;
+   end;
+   if PassIndex=0 then begin
+    if CodePoint<=$7f then begin
+     inc(OutputLen);
+    end else if CodePoint<=$7ff then begin
+     inc(OutputLen,2);
+    end else if CodePoint<=$ffff then begin
+     inc(OutputLen,3);
+    end else if CodePoint<=$1fffff then begin
+     inc(OutputLen,4);
+{$ifndef PUCUStrictUTF8}
+    end else if CodePoint<=$3ffffff then begin
+     inc(OutputLen,5);
+    end else if TPUCUUInt32(CodePoint)<=$7fffffff then begin
+     inc(OutputLen,6);
+{$endif}
+    end else begin
+     inc(OutputLen,3);
+    end;
+   end else begin
+    if CodePoint<=$7f then begin
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8(CodePoint));
+    end else if CodePoint<=$7ff then begin
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($c0 or ((CodePoint shr 6) and $1f)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or (CodePoint and $3f)));
+    end else if CodePoint<=$ffff then begin
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($e0 or ((CodePoint shr 12) and $0f)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or ((CodePoint shr 6) and $3f)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or (CodePoint and $3f)));
+    end else if CodePoint<=$1fffff then begin
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($f0 or ((CodePoint shr 18) and $07)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or ((CodePoint shr 12) and $3f)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or ((CodePoint shr 6) and $3f)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or (CodePoint and $3f)));
+{$ifndef PUCUStrictUTF8}
+    end else if CodePoint<=$3ffffff then begin
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($f8 or ((CodePoint shr 24) and $03)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or ((CodePoint shr 18) and $3f)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or ((CodePoint shr 12) and $3f)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or ((CodePoint shr 6) and $3f)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or (CodePoint and $3f)));
+    end else if TPUCUUInt32(CodePoint)<=$7fffffff then begin
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($fc or ((CodePoint shr 30) and $01)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or ((CodePoint shr 24) and $3f)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or ((CodePoint shr 18) and $3f)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or ((CodePoint shr 12) and $3f)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or ((CodePoint shr 6) and $3f)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or (CodePoint and $3f)));
+{$endif}
+    end else begin
+     CodePoint:=$fffd;
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($e0 or ((CodePoint shr 12) and $0f)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or ((CodePoint shr 6) and $3f)));
+     inc(OutputLen);
+     result[OutputLen]:=AnsiChar(TPUCUUInt8($80 or (CodePoint and $3f)));
+    end;
+   end;
+  end;
+  if PassIndex=0 then begin
+   SetLength(result,OutputLen);
+  end;
+ end;
+end;
+
+function PUCURawDataToUTF16String(const pData;const pDataLength:TPUCUInt32):TPUCUUTF16String;
+type PBytes=^TBytes;
+     TBytes=array[0..65535] of TPUCUUInt8;
+var Bytes:PBytes;
+    BytesPerCodeUnit,BytesPerCodeUnitMask,LittleEndianBigEndian,
+    PassIndex,CodeUnit,CodePoint,Temp,InputLen,OutputLen:TPUCUInt32;
+begin
+ result:='';
+ Bytes:=@pData;
+ if (pDataLength>=3) and (Bytes^[0]=$ef) and (Bytes^[1]=$bb) and (Bytes^[2]=$bf) then begin
+  // UTF8
+  BytesPerCodeUnit:=1;
+  BytesPerCodeUnitMask:=0;
+  LittleEndianBigEndian:=0;
+  Bytes:=@PBytes(@pData)^[0];
+  InputLen:=pDataLength-3;
+ end else if (pDataLength>=4) and
+             (((Bytes^[0]=$00) and (Bytes^[1]=$00) and (Bytes^[2]=$fe) and (Bytes^[3]=$ff)) or
+              ((Bytes^[0]=$ff) and (Bytes^[1]=$fe) and (Bytes^[2]=$00) and (Bytes^[3]=$00))) then begin
+  // UTF32
+  BytesPerCodeUnit:=4;
+  BytesPerCodeUnitMask:=3;
+  if Bytes^[0]=$00 then begin
+   // Big endian
+   LittleEndianBigEndian:=1;
+  end else begin
+   // Little endian
+   LittleEndianBigEndian:=0;
+  end;
+  Bytes:=@PBytes(@pData)^[4];
+  InputLen:=pDataLength-4;
+ end else if (pDataLength>=2) and
+             (((Bytes^[0]=$fe) and (Bytes^[1]=$ff)) or
+              ((Bytes^[0]=$ff) and (Bytes^[1]=$fe))) then begin
+  // UTF16
+  BytesPerCodeUnit:=2;
+  BytesPerCodeUnitMask:=1;
+  if Bytes^[0]=$fe then begin
+   // Big endian
+   LittleEndianBigEndian:=1;
+  end else begin
+   // Little endian
+   LittleEndianBigEndian:=0;
+  end;
+  Bytes:=@PBytes(@pData)^[2];
+  InputLen:=pDataLength-2;
+ end else begin
+  // Latin1
+  BytesPerCodeUnit:=0;
+  BytesPerCodeUnitMask:=0;
+  LittleEndianBigEndian:=0;
+  Bytes:=@PBytes(@pData)^[0];
+  InputLen:=pDataLength;
+ end;
+ for PassIndex:=0 to 1 do begin
+  CodeUnit:=0;
+  InputLen:=pDataLength-3;
+  OutputLen:=0;
+  while (CodeUnit+BytesPerCodeUnitMask)<InputLen do begin
+   case BytesPerCodeUnit of
+    1:begin
+     // UTF8
+     CodePoint:=PUCUUTF8PtrCodeUnitGetCharAndIncFallback(pointer(Bytes),InputLen,CodeUnit);
+    end;
+    2:begin
+     // UTF16
+     CodePoint:=(TPUCUInt32(Bytes^[CodeUnit+0]) shl UTF16LittleEndianBigEndianShifts[LittleEndianBigEndian,0]) or
+                (TPUCUInt32(Bytes^[CodeUnit+1]) shl UTF16LittleEndianBigEndianShifts[LittleEndianBigEndian,1]);
+     inc(CodeUnit,2);
+     if ((CodeUnit+1)<InputLen) and ((CodePoint and $fc00)=$d800) then begin
+      Temp:=(TPUCUInt32(Bytes^[CodeUnit+0]) shl UTF16LittleEndianBigEndianShifts[LittleEndianBigEndian,0]) or
+            (TPUCUInt32(Bytes^[CodeUnit+1]) shl UTF16LittleEndianBigEndianShifts[LittleEndianBigEndian,1]);
+      if (Temp and $fc00)=$dc00 then begin
+       CodePoint:=(TPUCUUTF32Char(TPUCUUTF32Char(CodePoint and $3ff) shl 10) or TPUCUUTF32Char(Temp and $3ff))+$10000;
+       inc(CodeUnit,2);
+      end;
+     end;
+    end;
+    4:begin
+     // UTF32
+     CodePoint:=(TPUCUInt32(Bytes^[CodeUnit+0]) shl UTF32LittleEndianBigEndianShifts[LittleEndianBigEndian,0]) or
+                (TPUCUInt32(Bytes^[CodeUnit+1]) shl UTF32LittleEndianBigEndianShifts[LittleEndianBigEndian,1]) or
+                (TPUCUInt32(Bytes^[CodeUnit+2]) shl UTF32LittleEndianBigEndianShifts[LittleEndianBigEndian,2]) or
+                (TPUCUInt32(Bytes^[CodeUnit+3]) shl UTF32LittleEndianBigEndianShifts[LittleEndianBigEndian,3]);
+     inc(CodeUnit,4);
+    end;
+    else begin
+     // Latin1
+     CodePoint:=Bytes^[CodeUnit];
+     inc(CodeUnit);
+    end;
+   end;
+   if PassIndex=0 then begin
+    if (CodePoint>=$10000) and (CodePoint<=$10ffff) then begin
+     inc(OutputLen,2);
+    end else begin
+     inc(OutputLen);
+    end;
+   end else begin
+    if (CodePoint>=$10000) and (CodePoint<=$10ffff) then begin
+     dec(CodePoint,$10000);
+     inc(OutputLen);
+     result[OutputLen]:=TPUCUUTF16Char(TPUCUUInt16((CodePoint shr 10) or $d800));
+     inc(OutputLen);
+     result[OutputLen]:=TPUCUUTF16Char(TPUCUUInt16((CodePoint and $3ff) or $dc00));
+    end else begin
+     inc(OutputLen);
+     result[OutputLen]:=TPUCUUTF16Char(TPUCUUInt16(CodePoint));
+    end;
+   end;
+  end;
+  if PassIndex=0 then begin
+   SetLength(result,OutputLen);
+  end;
+ end;
+end;
+
+function PUCURawDataToUTF32String(const pData;const pDataLength:TPUCUInt32):TPUCUUTF32String;
+type PBytes=^TBytes;
+     TBytes=array[0..65535] of TPUCUUInt8;
+var Bytes:PBytes;
+    BytesPerCodeUnit,BytesPerCodeUnitMask,LittleEndianBigEndian,
+    PassIndex,CodeUnit,CodePoint,Temp,InputLen,OutputLen:TPUCUInt32;
+begin
+ result:=nil;
+ Bytes:=@pData;
+ if (pDataLength>=3) and (Bytes^[0]=$ef) and (Bytes^[1]=$bb) and (Bytes^[2]=$bf) then begin
+  // UTF8
+  BytesPerCodeUnit:=1;
+  BytesPerCodeUnitMask:=0;
+  LittleEndianBigEndian:=0;
+  Bytes:=@PBytes(@pData)^[0];
+  InputLen:=pDataLength-3;
+ end else if (pDataLength>=4) and
+             (((Bytes^[0]=$00) and (Bytes^[1]=$00) and (Bytes^[2]=$fe) and (Bytes^[3]=$ff)) or
+              ((Bytes^[0]=$ff) and (Bytes^[1]=$fe) and (Bytes^[2]=$00) and (Bytes^[3]=$00))) then begin
+  // UTF32
+  BytesPerCodeUnit:=4;
+  BytesPerCodeUnitMask:=3;
+  if Bytes^[0]=$00 then begin
+   // Big endian
+   LittleEndianBigEndian:=1;
+  end else begin
+   // Little endian
+   LittleEndianBigEndian:=0;
+  end;
+  Bytes:=@PBytes(@pData)^[4];
+  InputLen:=pDataLength-4;
+ end else if (pDataLength>=2) and
+             (((Bytes^[0]=$fe) and (Bytes^[1]=$ff)) or
+              ((Bytes^[0]=$ff) and (Bytes^[1]=$fe))) then begin
+  // UTF16
+  BytesPerCodeUnit:=2;
+  BytesPerCodeUnitMask:=1;
+  if Bytes^[0]=$fe then begin
+   // Big endian
+   LittleEndianBigEndian:=1;
+  end else begin
+   // Little endian
+   LittleEndianBigEndian:=0;
+  end;
+  Bytes:=@PBytes(@pData)^[2];
+  InputLen:=pDataLength-2;
+ end else begin
+  // Latin1
+  BytesPerCodeUnit:=0;
+  BytesPerCodeUnitMask:=0;
+  LittleEndianBigEndian:=0;
+  Bytes:=@PBytes(@pData)^[0];
+  InputLen:=pDataLength;
+ end;
+ for PassIndex:=0 to 1 do begin
+  CodeUnit:=0;
+  InputLen:=pDataLength-3;
+  OutputLen:=0;
+  while (CodeUnit+BytesPerCodeUnitMask)<InputLen do begin
+   case BytesPerCodeUnit of
+    1:begin
+     // UTF8
+     CodePoint:=PUCUUTF8PtrCodeUnitGetCharAndIncFallback(pointer(Bytes),InputLen,CodeUnit);
+    end;
+    2:begin
+     // UTF16
+     CodePoint:=(TPUCUInt32(Bytes^[CodeUnit+0]) shl UTF16LittleEndianBigEndianShifts[LittleEndianBigEndian,0]) or
+                (TPUCUInt32(Bytes^[CodeUnit+1]) shl UTF16LittleEndianBigEndianShifts[LittleEndianBigEndian,1]);
+     inc(CodeUnit,2);
+     if ((CodeUnit+1)<InputLen) and ((CodePoint and $fc00)=$d800) then begin
+      Temp:=(TPUCUInt32(Bytes^[CodeUnit+0]) shl UTF16LittleEndianBigEndianShifts[LittleEndianBigEndian,0]) or
+            (TPUCUInt32(Bytes^[CodeUnit+1]) shl UTF16LittleEndianBigEndianShifts[LittleEndianBigEndian,1]);
+      if (Temp and $fc00)=$dc00 then begin
+       CodePoint:=(TPUCUUTF32Char(TPUCUUTF32Char(CodePoint and $3ff) shl 10) or TPUCUUTF32Char(Temp and $3ff))+$10000;
+       inc(CodeUnit,2);
+      end;
+     end;
+    end;
+    4:begin
+     // UTF32
+     CodePoint:=(TPUCUInt32(Bytes^[CodeUnit+0]) shl UTF32LittleEndianBigEndianShifts[LittleEndianBigEndian,0]) or
+                (TPUCUInt32(Bytes^[CodeUnit+1]) shl UTF32LittleEndianBigEndianShifts[LittleEndianBigEndian,1]) or
+                (TPUCUInt32(Bytes^[CodeUnit+2]) shl UTF32LittleEndianBigEndianShifts[LittleEndianBigEndian,2]) or
+                (TPUCUInt32(Bytes^[CodeUnit+3]) shl UTF32LittleEndianBigEndianShifts[LittleEndianBigEndian,3]);
+     inc(CodeUnit,4);
+    end;
+    else begin
+     // Latin1
+     CodePoint:=Bytes^[CodeUnit];
+     inc(CodeUnit);
+    end;
+   end;
+   if PassIndex=0 then begin
+    inc(OutputLen);
+   end else begin
+    result[OutputLen]:=CodePoint;
+    inc(OutputLen);
+   end;
+  end;
+  if PassIndex=0 then begin
+   SetLength(result,OutputLen);
+  end;
+ end;
+end;
+
+function PUCURawByteStringToUTF8String(const pString:TPUCURawByteString):TPUCUUTF8String;
+var p:PPUCURawByteChar;
+begin
+ if length(pString)>0 then begin
+  p:=PPUCURawByteChar(@pString[1]);
+  result:=PUCURawDataToUTF8String(p^,length(pString));
+ end else begin
+  result:='';
+ end;
+end;
+
+function PUCURawByteStringToUTF16String(const pString:TPUCURawByteString):TPUCUUTF16String;
+var p:PPUCURawByteChar;
+begin
+ if length(pString)>0 then begin
+  p:=PPUCURawByteChar(@pString[1]);
+  result:=PUCURawDataToUTF16String(p^,length(pString));
+ end else begin
+  result:='';
+ end;
+end;
+
+function PUCURawByteStringToUTF32String(const pString:TPUCURawByteString):TPUCUUTF32String;
+var p:PPUCURawByteChar;
+begin
+ if length(pString)>0 then begin
+  p:=PPUCURawByteChar(@pString[1]);
+  result:=PUCURawDataToUTF32String(p^,length(pString));
+ end else begin
+  result:=nil;
+ end;
+end;
+
+function PUCURawStreamToUTF8String(const pStream:TStream):TPUCUUTF8String;
+var Memory:pointer;
+    Size:TPUCUPtrInt;
+begin
+ result:='';
+ if assigned(pStream) and (pStream.Seek(0,soBeginning)=0) then begin
+  Size:=pStream.Size;
+  GetMem(Memory,Size);
+  try
+   if pStream.Read(Memory^,Size)=Size then begin
+    result:=PUCURawDataToUTF8String(Memory^,Size);
+   end;
+  finally
+   FreeMem(Memory);
+  end;
+ end;
+end;
+
+function PUCURawStreamToUTF16String(const pStream:TStream):TPUCUUTF16String;
+var Memory:pointer;
+    Size:TPUCUPtrInt;
+begin
+ result:='';
+ if assigned(pStream) and (pStream.Seek(0,soBeginning)=0) then begin
+  Size:=pStream.Size;
+  GetMem(Memory,Size);
+  try
+   if pStream.Read(Memory^,Size)=Size then begin
+    result:=PUCURawDataToUTF16String(Memory^,Size);
+   end;
+  finally
+   FreeMem(Memory);
+  end;
+ end;
+end;
+
+function PUCURawStreamToUTF32String(const pStream:TStream):TPUCUUTF32String;
+var Memory:pointer;
+    Size:TPUCUPtrInt;
+begin
+ result:=nil;
+ if assigned(pStream) and (pStream.Seek(0,soBeginning)=0) then begin
+  Size:=pStream.Size;
+  GetMem(Memory,Size);
+  try
+   if pStream.Read(Memory^,Size)=Size then begin
+    result:=PUCURawDataToUTF32String(Memory^,Size);
+   end;
+  finally
+   FreeMem(Memory);
+  end;
  end;
 end;
 
