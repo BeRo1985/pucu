@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2016-06-24-22-25-0000                       *
+ *                        Version 2016-06-24-23-18-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -456,6 +456,7 @@ function PUCUUTF16ToUTF32(const Value:TPUCUUTF16String):TPUCUUTF32String;
 function PUCUUTF32ToUTF16(const Value:TPUCUUTF32String):TPUCUUTF16String;
 
 function PUCUUTF32CharToUTF16(const Value:TPUCUUTF32Char):TPUCUUTF16String;
+function PUCUUTF32CharToUTF16Len(const Value:TPUCUUTF32Char):TPUCUInt32;
 
 implementation
 
@@ -2312,10 +2313,26 @@ begin
  end else if Value<=$ffff then begin
   result:=#$fffd;
  end else if Value<=$10ffff then begin
-  result:=TPUCUUTF16Char(TPUCUUInt16(((Value-$10000) shr 10) or $d800));
-  result:=result+TPUCUUTF16Char(TPUCUUInt16(((Value-$10000) and $3ff) or $dc00));
+  result:=TPUCUUTF16String(TPUCUUTF16Char(TPUCUUInt16(((Value-$10000) shr 10) or $d800)))+TPUCUUTF16String(TPUCUUTF16Char(TPUCUUInt16(((Value-$10000) and $3ff) or $dc00)));
  end else begin
   result:=#$fffd;
+ end;
+end;
+
+function PUCUUTF32CharToUTF16Len(const Value:TPUCUUTF32Char):TPUCUInt32;
+begin
+ if Value<=$d7ff then begin
+  result:=1;
+ end else if Value<=$dfff then begin
+  result:=1;
+ end else if Value<=$fffd then begin
+  result:=1;
+ end else if Value<=$ffff then begin
+  result:=1;
+ end else if Value<=$10ffff then begin
+  result:=2;
+ end else begin
+  result:=1;
  end;
 end;
 
