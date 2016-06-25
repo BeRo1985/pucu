@@ -149,7 +149,7 @@ type _cpinfoex=record
      CPINFOEX=_cpinfoex;
 
 var s:ansistring;
-    cp,i:longint;
+    cp,i,j,cu:longint;
     w:widestring;
     u,supported:array[word] of boolean;
     SubSubPages:array[word] of boolean;
@@ -199,6 +199,7 @@ begin
 end;
 
 begin
+ SetThreadLocale(MAKELONG(LANG_ENGLISH,SUBLANG_DEFAULT));
  SetThreadUILanguage(MAKELANGID(LANG_ENGLISH,SUBLANG_DEFAULT));
  FillChar(supported,sizeof(supported),#0);
  FillChar(CodePageNames,sizeof(CodePageNames),#0);
@@ -213,7 +214,7 @@ begin
  assignfile(t,'PUCUCodePages.inc');
  rewrite(t);
  writeln(t,'type PPUCUCharSetCodePage=^TPUCUCharSetCodePage;');
- writeln(t,'     TPUCUCharSetCodePage=array[0..255] of word;');
+ writeln(t,'     TPUCUCharSetCodePage=array[0..255] of longword;');
  writeln(t,'     PPUCUCharSetSubSubCodePages=^TPUCUCharSetSubSubCodePages;');
  writeln(t,'     TPUCUCharSetSubSubCodePages=array[0..15] of PPUCUCharSetCodePage;');
  writeln(t,'     PPUCUCharSetSubCodePages=^TPUCUCharSetSubCodePages;');
@@ -226,19 +227,26 @@ begin
  writeln(t,'     TPUCUCharSetSubCodePageNames=array[0..15] of PPUCUCharSetSubSubCodePageNames;');
  writeln(t,'     PPUCUCharSetCodePageNames=^TPUCUCharSetCodePageNames;');
  writeln(t,'     TPUCUCharSetCodePageNames=array[0..255] of PPUCUCharSetSubCodePageNames;');
- SetLength(w,256*2);
+ SetLength(w,1024);
  for cp:=0 to 65535 do begin
   u[cp]:=false;
   if (cp<>65001) and supported[cp] then begin
    SubSubPages[cp shr 4]:=true;
    SubPages[cp shr 8]:=true;
-   i:=MultiByteToWideChar(cp,0,PAnsiChar(s),256,PWideChar(w),512);
+   i:=MultiByteToWideChar(cp,0,PAnsiChar(s),256,PWideChar(w),1024);
    if i=256 then begin
     u[cp]:=true;
     write(t,'const PUCUCharSetCodePage',cp,':TPUCUCharSetCodePage=(');
     writeln(t);
+    j:=1;
     for i:=1 to 256 do begin
-     write(t,'$',LowerCase(IntToHex(ord(w[i]),4)));
+     cu:=Word(WideChar(w[j]));
+     inc(j);
+     if (j<=length(w)) and ((cu and $fc00)=$d800) and ((Word(WideChar(w[j])) and $fc00)=$dc00) then begin
+      cu:=((longword(cu and $3ff) shl 10) or longword(Word(WideChar(w[j])) and $3ff))+$10000;
+      inc(j);
+     end;
+     write(t,'$',LowerCase(IntToHex(cu,8)));
      if i<>256 then begin
       write(t,',');
      end else begin
