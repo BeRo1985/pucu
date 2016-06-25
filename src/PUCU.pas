@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2016-06-26-00-46-0000                       *
+ *                        Version 2016-06-26-00-55-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -395,8 +395,8 @@ type PPUCUInt8=^TPUCUInt8;
      PPUCUUTF8String=^TPUCUUTF8String;
      TPUCUUTF8String={$ifdef HAS_TYPE_UTF8STRING}UTF8String{$else}AnsiString{$endif};
 
-     PPUCUUTF16Char={$ifdef HAS_TYPE_UNICODESTRING}PUnicodeChar{$else}PWideChar{$endif};
-     TPUCUUTF16Char={$ifdef HAS_TYPE_UNICODESTRING}UnicodeChar{$else}WideChar{$endif};
+     PPUCUUTF16Char={$ifdef HAS_TYPE_UNICODESTRING}{$ifdef fpc}PUnicodeChar{$else}PWideChar{$endif}{$else}PWideChar{$endif};
+     TPUCUUTF16Char={$ifdef HAS_TYPE_UNICODESTRING}{$ifdef fpc}UnicodeChar{$else}WideChar{$endif}{$else}WideChar{$endif};
 
      PPUCUUTF16String=^TPUCUUTF16String;
      TPUCUUTF16String={$ifdef HAS_TYPE_UNICODESTRING}UnicodeString{$else}WideString{$endif};
