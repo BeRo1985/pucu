@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2016-06-28-05-31-0000                       *
+ *                        Version 2016-07-01-18-24-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -40348,10 +40348,13 @@ function PUCUUTF8PtrCodeUnitGetCharAndIncFallback(const s:PPUCURawByteChar;const
 function PUCUUTF8CodePointGetChar(const s:TPUCURawByteString;CodePoint:TPUCUInt32;Fallback:boolean=false):TPUCUUInt32;
 function PUCUUTF8GetCharLen(const s:TPUCURawByteString;i:TPUCUInt32):TPUCUUInt32;
 function PUCUUTF8Pos(const FindStr,InStr:TPUCURawByteString):TPUCUInt32;
+function PUCUUTF8LastPos(const FindStr,InStr:TPUCURawByteString):TPUCUInt32;
 function PUCUUTF8Copy(const Str:TPUCURawByteString;Start,Len:TPUCUInt32):TPUCURawByteString;
 function PUCUUTF8UpperCase(const Str:TPUCURawByteString):TPUCURawByteString;
 function PUCUUTF8LowerCase(const Str:TPUCURawByteString):TPUCURawByteString;
 function PUCUUTF8Trim(const Str:TPUCURawByteString):TPUCURawByteString;
+function PUCUUTF8TrimLeft(const Str:TPUCURawByteString):TPUCURawByteString;
+function PUCUUTF8TrimRight(const Str:TPUCURawByteString):TPUCURawByteString;
 function PUCUUTF8Correct(const Str:TPUCURawByteString):TPUCURawByteString;
 function PUCUUTF8FromLatin1(const Str:TPUCURawByteString):TPUCURawByteString;
 function PUCUUTF8LevenshteinDistance(const s,t:TPUCURawByteString):TPUCUInt32;
@@ -41084,6 +41087,31 @@ begin
  end;
 end;
 
+function PUCUUTF8LastPos(const FindStr,InStr:TPUCURawByteString):TPUCUInt32;
+var i,j,l:TPUCUInt32;
+    ok:boolean;
+begin
+ result:=0;
+ i:=1;
+ while i<=length(InStr) do begin
+  l:=i+length(FindStr)-1;
+  if l>length(InStr) then begin
+   exit;
+  end;
+  ok:=true;
+  for j:=1 to length(FindStr) do begin
+   if InStr[i+j-1]<>FindStr[j] then begin
+    ok:=false;
+    break;
+   end;
+  end;
+  if ok then begin
+   result:=i;
+  end;
+  inc(i,PUCUUTF8CharSteps[InStr[i]]);
+ end;
+end;
+
 function PUCUUTF8Copy(const Str:TPUCURawByteString;Start,Len:TPUCUInt32):TPUCURawByteString;
 var CodeUnit:TPUCUInt32;
 begin
@@ -41304,6 +41332,44 @@ begin
  while PUCUUnicodeIsWhiteSpace(PUCUUTF8CodeUnitGetChar(Str,i)) do begin
   inc(i,PUCUUTF8CharSteps[Str[i]]);
  end;
+ j:=length(Str)+1;
+ PUCUUTF8Dec(Str,j);
+ while PUCUUnicodeIsWhiteSpace(PUCUUTF8CodeUnitGetChar(Str,j)) do begin
+  PUCUUTF8Dec(Str,j);
+ end;
+ if (j<=length(Str)) and (Str[j]>=#80) then begin
+  inc(j,TPUCUInt32(PUCUUTF8GetCharLen(Str,j))-1);
+ end;
+ if i<=j then begin
+  result:=copy(Str,i,(j-i)+1);
+ end else begin
+  result:='';
+ end;
+end;
+
+function PUCUUTF8TrimLeft(const Str:TPUCURawByteString):TPUCURawByteString;
+var i,j:TPUCUInt32;
+begin
+ i:=1;
+ while PUCUUnicodeIsWhiteSpace(PUCUUTF8CodeUnitGetChar(Str,i)) do begin
+  inc(i,PUCUUTF8CharSteps[Str[i]]);
+ end;
+ j:=length(Str)+1;
+ PUCUUTF8Dec(Str,j);
+ if (j<=length(Str)) and (Str[j]>=#80) then begin
+  inc(j,TPUCUInt32(PUCUUTF8GetCharLen(Str,j))-1);
+ end;
+ if i<=j then begin
+  result:=copy(Str,i,(j-i)+1);
+ end else begin
+  result:='';
+ end;
+end;
+
+function PUCUUTF8TrimRight(const Str:TPUCURawByteString):TPUCURawByteString;
+var i,j:TPUCUInt32;
+begin
+ i:=1;
  j:=length(Str)+1;
  PUCUUTF8Dec(Str,j);
  while PUCUUnicodeIsWhiteSpace(PUCUUTF8CodeUnitGetChar(Str,j)) do begin
