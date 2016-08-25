@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2016-07-01-18-24-0000                       *
+ *                        Version 2016-08-25-13-39-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -471,6 +471,7 @@ function PUCUUTF16UpperCase(const Str:TPUCUUTF16String):TPUCUUTF16String;
 function PUCUUTF16LowerCase(const Str:TPUCUUTF16String):TPUCUUTF16String;
 
 function PUCUUTF32CharToUTF8(CharValue:TPUCUUTF32Char):TPUCURawByteString;
+function PUCUUTF32CharToUTF8At(CharValue:TPUCUUTF32Char;var s:TPUCURawByteString;const Index:TPUCUInt32):TPUCUInt32;
 function PUCUUTF32CharToUTF8Len(CharValue:TPUCUUTF32Char):TPUCUInt32;
 
 function PUCUUTF32ToUTF8(const s:TPUCUUTF32String):TPUCUUTF8String;
@@ -1966,6 +1967,74 @@ begin
    ResultLen:=3;
   end;
   SetString(result,PPUCURawByteChar(@Data[0]),ResultLen);
+ end;
+end;
+
+function PUCUUTF32CharToUTF8At(CharValue:TPUCUUTF32Char;var s:TPUCURawByteString;const Index:TPUCUInt32):TPUCUInt32;
+var Data:array[0..{$ifdef PUCUStrictUTF8}3{$else}5{$endif}] of TPUCURawByteChar;
+    ResultLen:TPUCUInt32;
+begin
+ if CharValue=0 then begin
+  result:=0;
+ end else begin
+  if CharValue<=$7f then begin
+   Data[0]:=TPUCURawByteChar(TPUCUUInt8(CharValue));
+   ResultLen:=1;
+  end else if CharValue<=$7ff then begin
+   Data[0]:=TPUCURawByteChar(TPUCUUInt8($c0 or ((CharValue shr 6) and $1f)));
+   Data[1]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+   ResultLen:=2;
+{$ifdef PUCUStrictUTF8}
+  end else if CharValue<=$d7ff then begin
+   Data[0]:=TPUCURawByteChar(TPUCUUInt8($e0 or ((CharValue shr 12) and $0f)));
+   Data[1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+   Data[2]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+   ResultLen:=3;
+  end else if CharValue<=$dfff then begin
+   Data[0]:=#$ef; // $fffd
+   Data[1]:=#$bf;
+   Data[2]:=#$bd;
+   ResultLen:=3;
+{$endif}
+  end else if CharValue<=$ffff then begin
+   Data[0]:=TPUCURawByteChar(TPUCUUInt8($e0 or ((CharValue shr 12) and $0f)));
+   Data[1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+   Data[2]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+   ResultLen:=3;
+  end else if CharValue<=$1fffff then begin
+   Data[0]:=TPUCURawByteChar(TPUCUUInt8($f0 or ((CharValue shr 18) and $07)));
+   Data[1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+   Data[2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+   Data[3]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+   ResultLen:=4;
+{$ifndef PUCUStrictUTF8}
+  end else if CharValue<=$3ffffff then begin
+   Data[0]:=TPUCURawByteChar(TPUCUUInt8($f8 or ((CharValue shr 24) and $03)));
+   Data[1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 18) and $3f)));
+   Data[2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+   Data[3]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+   Data[4]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+   ResultLen:=5;
+  end else if CharValue<=$7fffffff then begin
+   Data[0]:=TPUCURawByteChar(TPUCUUInt8($fc or ((CharValue shr 30) and $01)));
+   Data[1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 24) and $3f)));
+   Data[2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 18) and $3f)));
+   Data[3]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+   Data[4]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+   Data[5]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+   ResultLen:=6;
+{$endif}
+  end else begin
+   Data[0]:=#$ef; // $fffd
+   Data[1]:=#$bf;
+   Data[2]:=#$bd;
+   ResultLen:=3;
+  end;
+  if (Index+ResultLen)>length(s) then begin
+   SetLength(s,Index+ResultLen);
+  end;
+  Move(Data[0],s[Index],ResultLen);
+  result:=ResultLen;
  end;
 end;
 
