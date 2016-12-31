@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2016-08-25-13-39-0000                       *
+ *                        Version 2016-12-31-21-14-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -405,7 +405,7 @@ type PPUCUInt8=^TPUCUInt8;
      TPUCUUTF16String={$ifdef HAS_TYPE_UNICODESTRING}UnicodeString{$else}WideString{$endif};
 
      PPUCUUTF32Char=^TPUCUUTF32Char;
-     TPUCUUTF32Char=TPUCUUInt32;
+     TPUCUUTF32Char=TPUCUInt32;
 
      TPUCUUTF32String=array of TPUCUUTF32Char;
 
