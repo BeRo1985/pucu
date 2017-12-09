@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2016-12-31-21-14-0000                       *
+ *                        Version 2017-12-09-05-29-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -1020,7 +1020,7 @@ begin
  Len:=length(s);
  if (CodeUnit>0) and (CodeUnit<=Len) then begin
   State:=ucACCEPT;
-  while CodeUnit<=Len do begin
+  repeat
    Value:=TPUCUUInt8(TPUCURawByteChar(s[CodeUnit]));
    inc(CodeUnit);
    CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
@@ -1030,10 +1030,7 @@ begin
     result:=(result shl 6) or (Value and $3f);
    end;
    State:=PUCUUTF8DFATransitions[State+CharClass];
-   if State<=ucERROR then begin
-    break;
-   end;
-  end;
+  until (State<=ucERROR) or (CodeUnit>Len);
   if State<>ucACCEPT then begin
    result:=$fffd;
   end;
@@ -1046,7 +1043,7 @@ begin
  result:=0;
  if (CodeUnit>=0) and (CodeUnit<Len) then begin
   State:=ucACCEPT;
-  while CodeUnit<Len do begin
+  repeat
    Value:=TPUCUUInt8(TPUCURawByteChar(s[CodeUnit]));
    inc(CodeUnit);
    CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
@@ -1056,10 +1053,7 @@ begin
     result:=(result shl 6) or (Value and $3f);
    end;
    State:=PUCUUTF8DFATransitions[State+CharClass];
-   if State<=ucERROR then begin
-    break;
-   end;
-  end;
+  until (State<=ucERROR) or (CodeUnit>=Len);
   if State<>ucACCEPT then begin
    result:=$fffd;
   end;
@@ -1075,7 +1069,7 @@ begin
  if (CodeUnit>0) and (CodeUnit<=Len) then begin
   StartCodeUnit:=CodeUnit;
   State:=ucACCEPT;
-  while CodeUnit<=Len do begin
+  repeat
    Value:=TPUCUUInt8(TPUCURawByteChar(s[CodeUnit]));
    inc(CodeUnit);
    CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
@@ -1085,10 +1079,7 @@ begin
     result:=(result shl 6) or (Value and $3f);
    end;
    State:=PUCUUTF8DFATransitions[State+CharClass];
-   if State<=ucERROR then begin
-    break;
-   end;
-  end;
+  until (State<=ucERROR) or (CodeUnit>Len);
   if State<>ucACCEPT then begin
    result:=TPUCUUInt8(TPUCURawByteChar(s[StartCodeUnit]));
   end;
@@ -1104,7 +1095,7 @@ begin
  if (CodeUnit>0) and (CodeUnit<=Len) then begin
   StartCodeUnit:=CodeUnit;
   State:=ucACCEPT;
-  while CodeUnit<=Len do begin
+  repeat
    Value:=TPUCUUInt8(TPUCURawByteChar(s[CodeUnit]));
    inc(CodeUnit);
    CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
@@ -1114,10 +1105,7 @@ begin
     result:=(result shl 6) or (Value and $3f);
    end;
    State:=PUCUUTF8DFATransitions[State+CharClass];
-   if State<=ucERROR then begin
-    break;
-   end;
-  end;
+  until (State<=ucERROR) or (CodeUnit>Len);
   if State<>ucACCEPT then begin
    result:=TPUCUUInt8(TPUCURawByteChar(s[StartCodeUnit]));
    CodeUnit:=StartCodeUnit+1;
@@ -1132,7 +1120,7 @@ begin
  if (CodeUnit>=0) and (CodeUnit<Len) then begin
   StartCodeUnit:=CodeUnit;
   State:=ucACCEPT;
-  while CodeUnit<Len do begin
+  repeat
    Value:=TPUCUUInt8(TPUCURawByteChar(s[CodeUnit]));
    inc(CodeUnit);
    CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
@@ -1142,10 +1130,7 @@ begin
     result:=(result shl 6) or (Value and $3f);
    end;
    State:=PUCUUTF8DFATransitions[State+CharClass];
-   if State<=ucERROR then begin
-    break;
-   end;
-  end;
+  until (State<=ucERROR) or (CodeUnit>=Len);
   if State<>ucACCEPT then begin
    result:=TPUCUUInt8(TPUCURawByteChar(s[StartCodeUnit]));
    CodeUnit:=StartCodeUnit+1;
