@@ -45629,8 +45629,8 @@ begin
                                                                             PUCUUnicodeCharacterCompositionHashTableMask];
      while (CompositionSequenceIndex>0) and (CompositionSequenceIndex<PUCUUnicodeCharacterCompositionSequenceCount) do begin
       CharacterCompositionSequence:=@PUCUUnicodeCharacterCompositionSequences[CompositionSequenceIndex];
-      if (CharacterCompositionSequence^.Sequence[0]=StartCodePoint) and
-         (CharacterCompositionSequence^.Sequence[1]=CodePoint) then begin
+      if (longword(CharacterCompositionSequence^.Sequence[0])=longword(StartCodePoint)) and
+         (longword(CharacterCompositionSequence^.Sequence[1])=longword(CodePoint)) then begin
        CompositeCodePoint:=CharacterCompositionSequence^.CodePoint;
        break;
       end else begin
