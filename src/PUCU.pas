@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2017-12-09-22-34-0000                       *
+ *                        Version 2017-12-26-03-44-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -45526,9 +45526,7 @@ end;
 
 function PUCUUTF32Normalize(const aString:TPUCUUTF32String;const aCompose:boolean=true):TPUCUUTF32String;
 var Index,Len,DecompositionTableStartIndex,DecompositionTableItemLength,SubIndex,StartIndex,
-    EndIndex,TargetIndex,CodePointClass,CompositionTableIndex,LastClass,
-    CompositionSequenceIndex:TPUCUInt32;
-    Hash:TPUCUUInt32;
+    EndIndex,TargetIndex,CodePointClass,LastClass,CompositionSequenceIndex:TPUCUInt32;
     CodePoint,StartCodePoint,CompositeCodePoint:TPUCUUTF32Char;
     OutputString:TPUCUUTF32String;
     CharacterCompositionSequence:PPUCUUnicodeCharacterCompositionSequence;
