@@ -115,6 +115,9 @@ program PUCUDebug;
 {$ifdef wince}
  {$define windows}
 {$endif}
+{$ifdef windows}
+ {$apptype console}
+{$endif}
 {$rangechecks off}
 {$extendedsyntax on}
 {$writeableconst on}
@@ -128,15 +131,26 @@ program PUCUDebug;
 {$longstrings on}
 {$openstrings on}
 
-uses SysUtils,Classes,PUCUCode;
+uses Windows,SysUtils,Classes,PUCUCode;
 
  // Used only for to debug&test the input PUCUCode.pas for POCABuild.dpr
 var Stream:TStream;
+    b:TPUCUUTF8String;
 begin
+ SetConsoleOutputCP(CP_UTF8);
  Stream:=TFileStream.Create('test.js',fmOpenRead or fmShareDenyWrite);
  try
   PUCURawStreamToUTF16String(Stream);
  finally
   Stream.Free;
  end;
+ b:=#$c4+'ffin';
+ writeln(b);
+ b:=PUCUUTF8Correct(b);
+ writeln(b);
+ b:=PUCUUTF8Normalize(b,false);
+ writeln(b);
+ b:=PUCUUTF8Normalize(b,true);
+ writeln(b);
+ readln;
 end.

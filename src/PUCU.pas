@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2017-12-26-03-44-0000                       *
+ *                        Version 2017-12-26-10-47-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -45623,7 +45623,7 @@ begin
     end else begin
      CompositeCodePoint:=0;
      CompositionSequenceIndex:=PUCUUnicodeCharacterCompositionHashTableData[TPUCUUInt32((TPUCUUInt32(StartCodePoint)*98303927) xor
-                                                                                        (TPUCUUInt32(StartCodePoint)*24710753)) and
+                                                                                        (TPUCUUInt32(CodePoint)*24710753)) and
                                                                             PUCUUnicodeCharacterCompositionHashTableMask];
      while (CompositionSequenceIndex>0) and (CompositionSequenceIndex<PUCUUnicodeCharacterCompositionSequenceCount) do begin
       CharacterCompositionSequence:=@PUCUUnicodeCharacterCompositionSequences[CompositionSequenceIndex];
