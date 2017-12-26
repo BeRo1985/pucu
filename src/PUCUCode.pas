@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2017-12-26-10-47-0000                       *
+ *                        Version 2017-12-26-22-02-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -1448,15 +1448,17 @@ function PUCUUTF8Trim(const Str:TPUCURawByteString):TPUCURawByteString;
 var i,j:TPUCUInt32;
 begin
  i:=1;
- while PUCUUnicodeIsWhiteSpace(PUCUUTF8CodeUnitGetChar(Str,i)) do begin
+ while (i<=length(Str)) and PUCUUnicodeIsWhiteSpace(PUCUUTF8CodeUnitGetChar(Str,i)) do begin
   inc(i,PUCUUTF8CharSteps[Str[i]]);
  end;
  j:=length(Str)+1;
  PUCUUTF8Dec(Str,j);
- while PUCUUnicodeIsWhiteSpace(PUCUUTF8CodeUnitGetChar(Str,j)) do begin
+ while (j>0) and
+       (j<=length(Str)) and
+       PUCUUnicodeIsWhiteSpace(PUCUUTF8CodeUnitGetChar(Str,j)) do begin
   PUCUUTF8Dec(Str,j);
  end;
- if (j<=length(Str)) and (Str[j]>=#80) then begin
+ if (j>0) and (j<=length(Str)) and (Str[j]>=#80) then begin
   inc(j,TPUCUInt32(PUCUUTF8GetCharLen(Str,j))-1);
  end;
  if i<=j then begin
@@ -1470,12 +1472,12 @@ function PUCUUTF8TrimLeft(const Str:TPUCURawByteString):TPUCURawByteString;
 var i,j:TPUCUInt32;
 begin
  i:=1;
- while PUCUUnicodeIsWhiteSpace(PUCUUTF8CodeUnitGetChar(Str,i)) do begin
+ while (i<=length(Str)) and PUCUUnicodeIsWhiteSpace(PUCUUTF8CodeUnitGetChar(Str,i)) do begin
   inc(i,PUCUUTF8CharSteps[Str[i]]);
  end;
  j:=length(Str)+1;
  PUCUUTF8Dec(Str,j);
- if (j<=length(Str)) and (Str[j]>=#80) then begin
+ if (j>0) and (j<=length(Str)) and (Str[j]>=#80) then begin
   inc(j,TPUCUInt32(PUCUUTF8GetCharLen(Str,j))-1);
  end;
  if i<=j then begin
@@ -1491,10 +1493,12 @@ begin
  i:=1;
  j:=length(Str)+1;
  PUCUUTF8Dec(Str,j);
- while PUCUUnicodeIsWhiteSpace(PUCUUTF8CodeUnitGetChar(Str,j)) do begin
+ while (j>0) and
+       (j<=length(Str)) and
+        PUCUUnicodeIsWhiteSpace(PUCUUTF8CodeUnitGetChar(Str,j)) do begin
   PUCUUTF8Dec(Str,j);
  end;
- if (j<=length(Str)) and (Str[j]>=#80) then begin
+ if (j>0) and (j<=length(Str)) and (Str[j]>=#80) then begin
   inc(j,TPUCUInt32(PUCUUTF8GetCharLen(Str,j))-1);
  end;
  if i<=j then begin
