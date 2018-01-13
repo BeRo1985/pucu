@@ -3012,6 +3012,7 @@ begin
  end;
 {$endif}
  UnitSourceList.Add('');
+{$ifdef PUCUStrictUTF8}
  UnitSourceList.Add('                                                       //0 1 2 3 4 5 6 7 8 9 a b c d e f');
  UnitSourceList.Add('const PUCUUTF8CharSteps:array[TPUCURawByteChar] of byte=(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  // 0');
  UnitSourceList.Add('                                                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  // 1');
@@ -3030,6 +3031,26 @@ begin
  UnitSourceList.Add('                                                         3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  // e');
  UnitSourceList.Add('                                                         4,4,4,4,4,1,1,1,1,1,1,1,1,1,1,1); // f');
  UnitSourceList.Add('                                                       //0 1 2 3 4 5 6 7 8 9 a b c d e f');
+{$else}
+ UnitSourceList.Add('                                                       //0 1 2 3 4 5 6 7 8 9 a b c d e f');
+ UnitSourceList.Add('const PUCUUTF8CharSteps:array[TPUCURawByteChar] of byte=(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  // 0');
+ UnitSourceList.Add('                                                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  // 1');
+ UnitSourceList.Add('                                                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  // 2');
+ UnitSourceList.Add('                                                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  // 3');
+ UnitSourceList.Add('                                                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  // 4');
+ UnitSourceList.Add('                                                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  // 5');
+ UnitSourceList.Add('                                                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  // 6');
+ UnitSourceList.Add('                                                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  // 7');
+ UnitSourceList.Add('                                                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  // 8');
+ UnitSourceList.Add('                                                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  // 9');
+ UnitSourceList.Add('                                                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  // a');
+ UnitSourceList.Add('                                                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  // b');
+ UnitSourceList.Add('                                                         1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  // c');
+ UnitSourceList.Add('                                                         2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  // d');
+ UnitSourceList.Add('                                                         3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  // e');
+ UnitSourceList.Add('                                                         4,4,4,4,4,4,4,4,5,5,5,5,6,6,6,6); // f');
+ UnitSourceList.Add('                                                       //0 1 2 3 4 5 6 7 8 9 a b c d e f');
+{$endif}
  UnitSourceList.Add('');
  UnitSourceList.Add('const PUCUUTF8DFACharClasses:array[TPUCURawByteChar] of byte=(');
  for i:=0 to 255 do begin
