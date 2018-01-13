@@ -2777,6 +2777,7 @@ const cc007F=$0;
   UTF8DFATransitions[(FromState*tsMUL)+AtCharClass]:=ToState*tsMUL;
  end;
 var i:longint;
+    s:string;
 begin
  FillChar(UTF8DFACharClasses,sizeof(TUTF8Chars),#0);
  FillChar(UTF8DFATransitions,sizeof(TUTF8Bytes),#0);
@@ -3052,21 +3053,33 @@ begin
  UnitSourceList.Add('                                                       //0 1 2 3 4 5 6 7 8 9 a b c d e f');
 {$endif}
  UnitSourceList.Add('');
- UnitSourceList.Add('const PUCUUTF8DFACharClasses:array[TPUCURawByteChar] of byte=(');
+ s:='const PUCUUTF8DFACharClasses:array[TPUCURawByteChar] of byte=(';
  for i:=0 to 255 do begin
+  s:=s+'$'+LowerCase(IntToHex(UTF8DFACharClasses[TPUCURawByteChar(byte(i))],2));
   if i<>255 then begin
-   UnitSourceList.Add(IntToStr(UTF8DFACharClasses[TPUCURawByteChar(byte(i))])+',');
+   s:=s+',';
+   if (i and 15)=$f then begin
+    UnitSourceList.Add(s);
+    s:='                                                              ';
+   end;
   end else begin
-   UnitSourceList.Add(IntToStr(UTF8DFACharClasses[TPUCURawByteChar(byte(i))])+');');
+   s:=s+');';
+   UnitSourceList.Add(s);
   end;
  end;
  UnitSourceList.Add('');
- UnitSourceList.Add('const PUCUUTF8DFATransitions:array[byte] of byte=(');
+ s:='const PUCUUTF8DFATransitions:array[byte] of byte=(';
  for i:=0 to 255 do begin
+  s:=s+'$'+LowerCase(IntToHex(UTF8DFATransitions[i],2));
   if i<>255 then begin
-   UnitSourceList.Add(IntToStr(UTF8DFATransitions[i])+',');
+   s:=s+',';
+   if (i and 15)=$f then begin
+    UnitSourceList.Add(s);
+    s:='                                                  ';
+   end;
   end else begin
-   UnitSourceList.Add(IntToStr(UTF8DFATransitions[i])+');');
+   s:=s+');';
+   UnitSourceList.Add(s);
   end;
  end;
  UnitSourceList.Add('');
