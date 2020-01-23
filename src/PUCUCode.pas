@@ -1,12 +1,12 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2018-01-16-19-37-0000                       *
+ *                        Version 2020-01-23-14-34-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
  *                                                                            *
- * Copyright (C) 2016-2017, Benjamin Rosseaux (benjamin@rosseaux.de)          *
+ * Copyright (C) 2016-2020, Benjamin Rosseaux (benjamin@rosseaux.de)          *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *
@@ -1519,7 +1519,7 @@ begin
   result:='';
   CodeUnit:=1;
   Len:=length(Str);
-  SetLength(result,Len*{$ifdef PUCUStrictUTF8}4{$else}6{$endif});
+  SetLength(result,Len);
   Data:=@result[1];
   ResultLen:=0;
   while CodeUnit<=Len do begin
@@ -1543,6 +1543,10 @@ begin
    if State<>ucACCEPT then begin
     CharValue:=TPUCUUInt8(TPUCURawByteChar(Str[StartCodeUnit]));
     CodeUnit:=StartCodeUnit+1;
+   end;
+   if (ResultLen+6)>length(result) then begin
+    SetLength(result,ResultLen+$10000);
+    Data:=@result[1];
    end;
    if CharValue<=$7f then begin
     Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8(CharValue));
