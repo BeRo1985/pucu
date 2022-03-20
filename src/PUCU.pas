@@ -1,12 +1,12 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2020-01-23-14-34-0000                       *
+ *                        Version 2022-03-20-07-22-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
  *                                                                            *
- * Copyright (C) 2016-2020, Benjamin Rosseaux (benjamin@rosseaux.de)          *
+ * Copyright (C) 2016-2022, Benjamin Rosseaux (benjamin@rosseaux.de)          *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *
@@ -43346,7 +43346,7 @@ begin
 end;
 
 function PUCUUTF8Correct(const Str:TPUCURawByteString):TPUCURawByteString;
-var CodeUnit,Len,ResultLen:TPUCUInt32;
+var CodeUnit,Len,ResultLen,Pass:TPUCUInt32;
     StartCodeUnit,Value,CharClass,State,CharValue:TPUCUUInt32;
     Data:PPUCURawByteChar;
 begin
@@ -43354,92 +43354,115 @@ begin
   result:=Str;
  end else begin
   result:='';
-  CodeUnit:=1;
   Len:=length(Str);
   SetLength(result,Len);
-  Data:=@result[1];
-  ResultLen:=0;
-  while CodeUnit<=Len do begin
-   StartCodeUnit:=CodeUnit;
-   State:=ucACCEPT;
-   CharValue:=0;
+  for Pass:=0 to 1 do begin
+   Data:=@result[1];
+   ResultLen:=0;
+   CodeUnit:=1;
    while CodeUnit<=Len do begin
-    Value:=TPUCUUInt8(TPUCURawByteChar(Str[CodeUnit]));
-    inc(CodeUnit);
-    CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
-    if State=ucACCEPT then begin
-     CharValue:=Value and ($ff shr CharClass);
-    end else begin
-     CharValue:=(CharValue shl 6) or (Value and $3f);
+    StartCodeUnit:=CodeUnit;
+    State:=ucACCEPT;
+    CharValue:=0;
+    while CodeUnit<=Len do begin
+     Value:=TPUCUUInt8(TPUCURawByteChar(Str[CodeUnit]));
+     inc(CodeUnit);
+     CharClass:=PUCUUTF8DFACharClasses[TPUCURawByteChar(Value)];
+     if State=ucACCEPT then begin
+      CharValue:=Value and ($ff shr CharClass);
+     end else begin
+      CharValue:=(CharValue shl 6) or (Value and $3f);
+     end;
+     State:=PUCUUTF8DFATransitions[State+CharClass];
+     if State<=ucERROR then begin
+      break;
+     end;
     end;
-    State:=PUCUUTF8DFATransitions[State+CharClass];
-    if State<=ucERROR then begin
-     break;
+    if State<>ucACCEPT then begin
+     CharValue:=TPUCUUInt8(TPUCURawByteChar(Str[StartCodeUnit]));
+     CodeUnit:=StartCodeUnit+1;
     end;
-   end;
-   if State<>ucACCEPT then begin
-    CharValue:=TPUCUUInt8(TPUCURawByteChar(Str[StartCodeUnit]));
-    CodeUnit:=StartCodeUnit+1;
-   end;
-   if (ResultLen+6)>length(result) then begin
-    SetLength(result,ResultLen+$10000);
-    Data:=@result[1];
-   end;
-   if CharValue<=$7f then begin
-    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8(CharValue));
-    inc(ResultLen);
-   end else if CharValue<=$7ff then begin
-    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($c0 or ((CharValue shr 6) and $1f)));
-    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
-    inc(ResultLen,2);
+    if (Pass=1) and ((ResultLen+6)>length(result)) then begin
+     SetLength(result,((TPUCUInt64(ResultLen)*5) shr 2)+$10000);
+     Data:=@result[1];
+    end;
+    if CharValue<=$7f then begin
+     if Pass=1 then begin
+      Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8(CharValue));
+     end;
+     inc(ResultLen);
+    end else if CharValue<=$7ff then begin
+     if Pass=1 then begin
+      Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($c0 or ((CharValue shr 6) and $1f)));
+      Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+     end;
+     inc(ResultLen,2);
 {$ifdef PUCUStrictUTF8}
-   end else if CharValue<=$d7ff then begin
-    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($e0 or ((CharValue shr 12) and $0f)));
-    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
-    inc(ResultLen,3);
-   end else if CharValue<=$dfff then begin
-    Data[ResultLen]:=#$ef; // $fffd
-    Data[ResultLen+1]:=#$bf;
-    Data[ResultLen+2]:=#$bd;
-    inc(ResultLen,3);
+    end else if CharValue<=$d7ff then begin
+     if Pass=1 then begin
+      Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($e0 or ((CharValue shr 12) and $0f)));
+      Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+      Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+     end;
+     inc(ResultLen,3);
+    end else if CharValue<=$dfff then begin
+     if Pass=1 then begin
+      Data[ResultLen]:=#$ef; // $fffd
+      Data[ResultLen+1]:=#$bf;
+      Data[ResultLen+2]:=#$bd;
+     end;
+     inc(ResultLen,3);
 {$endif}
-   end else if CharValue<=$ffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($e0 or ((CharValue shr 12) and $0f)));
-    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
-    inc(ResultLen,3);
-   end else if CharValue<=$1fffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($f0 or ((CharValue shr 18) and $07)));
-    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+3]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
-    inc(ResultLen,4);
+    end else if CharValue<=$ffff then begin
+     if Pass=1 then begin
+      Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($e0 or ((CharValue shr 12) and $0f)));
+      Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+      Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+     end;
+     inc(ResultLen,3);
+    end else if CharValue<=$1fffff then begin
+     if Pass=1 then begin
+      Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($f0 or ((CharValue shr 18) and $07)));
+      Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+      Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+      Data[ResultLen+3]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+     end;
+     inc(ResultLen,4);
 {$ifndef PUCUStrictUTF8}
-   end else if CharValue<=$3ffffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($f8 or ((CharValue shr 24) and $03)));
-    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 18) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
-    Data[ResultLen+3]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+4]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
-    inc(ResultLen,5);
-   end else if CharValue<=$7fffffff then begin
-    Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($fc or ((CharValue shr 30) and $01)));
-    Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 24) and $3f)));
-    Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 18) and $3f)));
-    Data[ResultLen+3]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
-    Data[ResultLen+4]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
-    Data[ResultLen+5]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
-    inc(ResultLen,6);
+    end else if CharValue<=$3ffffff then begin
+     if Pass=1 then begin
+      Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($f8 or ((CharValue shr 24) and $03)));
+      Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 18) and $3f)));
+      Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+      Data[ResultLen+3]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+      Data[ResultLen+4]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+     end;
+     inc(ResultLen,5);
+    end else if CharValue<=$7fffffff then begin
+     if Pass=1 then begin
+      Data[ResultLen]:=TPUCURawByteChar(TPUCUUInt8($fc or ((CharValue shr 30) and $01)));
+      Data[ResultLen+1]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 24) and $3f)));
+      Data[ResultLen+2]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 18) and $3f)));
+      Data[ResultLen+3]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 12) and $3f)));
+      Data[ResultLen+4]:=TPUCURawByteChar(TPUCUUInt8($80 or ((CharValue shr 6) and $3f)));
+      Data[ResultLen+5]:=TPUCURawByteChar(TPUCUUInt8($80 or (CharValue and $3f)));
+     end;
+     inc(ResultLen,6);
 {$endif}
-   end else begin
-    Data[ResultLen]:=#$ef; // $fffd
-    Data[ResultLen+1]:=#$bf;
-    Data[ResultLen+2]:=#$bd;
-    inc(ResultLen,3);
+    end else begin
+     if Pass=1 then begin
+      Data[ResultLen]:=#$ef; // $fffd
+      Data[ResultLen+1]:=#$bf;
+      Data[ResultLen+2]:=#$bd;
+     end;
+     inc(ResultLen,3);
+    end;
    end;
+   if Pass=0 then begin
+    inc(ResultLen,8);
+   end;
+   SetLength(result,ResultLen);
   end;
-  SetLength(result,ResultLen);
  end;
 end;
 
