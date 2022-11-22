@@ -1,7 +1,7 @@
 (******************************************************************************
  *                     PUCU Pascal UniCode Utils Libary                       *
  ******************************************************************************
- *                        Version 2022-11-22-16-10-0000                       *
+ *                        Version 2022-11-22-16-12-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -2015,7 +2015,7 @@ begin
 end;
 
 {$ifdef fpc}{$notes off}{$endif}
-function  (CharValue:TPUCUUTF32Char;var s:TPUCURawByteString;const Index:TPUCUInt32):TPUCUInt32;
+function PUCUUTF32CharToUTF8At(CharValue:TPUCUUTF32Char;var s:TPUCURawByteString;const Index:TPUCUInt32):TPUCUInt32;
 var Data:array[0..{$ifdef PUCUStrictUTF8}3{$else}5{$endif}] of TPUCURawByteChar;
     ResultLen:TPUCUInt32;
 begin
