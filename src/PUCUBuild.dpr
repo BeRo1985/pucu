@@ -1674,7 +1674,7 @@ begin
   l:=$ffffffff;
   h:=0;
   for i:=0 to $10ffff do begin
-   if (UnicodeGetCategoryFromTable(i) in [PUCUUnicodeCategoryLu,PUCUUnicodeCategoryLl,PUCUUnicodeCategoryLt,PUCUUnicodeCategoryLm,PUCUUnicodeCategoryLo,PUCUUnicodeCategoryNd,PUCUUnicodeCategoryNl,PUCUUnicodeCategoryNo,PUCUUnicodeCategoryPc]) or (i=ord('_')) then begin
+   if not (UnicodeGetCategoryFromTable(i) in [PUCUUnicodeCategoryZs, PUCUUnicodeCategoryZl, PUCUUnicodeCategoryZp, PUCUUnicodeCategoryPd, PUCUUnicodeCategoryPs, PUCUUnicodeCategoryPe, PUCUUnicodeCategoryPc, PUCUUnicodeCategoryPo, PUCUUnicodeCategoryPi, PUCUUnicodeCategoryPf, PUCUUnicodeCategoryCn, PUCUUnicodeCategoryCc, PUCUUnicodeCategoryCf, PUCUUnicodeCategoryCo, PUCUUnicodeCategoryCs]) then begin
     if l<=h then begin
      if (h+1)=i then begin
       h:=i;
